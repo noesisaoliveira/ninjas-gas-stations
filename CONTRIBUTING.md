@@ -2,7 +2,7 @@
 
 ## Development
 
-Backend: from `ninjas_gas_stations/`, install `requirements-dev.txt`, then run `ruff check app tests`, `black --check app tests`, `mypy app`, and `pytest -q`.
+Backend: from `ninjas_gas_stations/`, install `requirements-dev.txt`, then run `ruff check app tests`, `black --check app tests`, `mypy app`, and `pytest -q`. Runtime dependencies intentionally avoid Uvicorn's optional compiled extras so the add-on can install on armv7 systems.
 
 Card: from `ninjas-gas-stations-card/`, run `npm ci`, `npm run typecheck`, `npm test`, and `npm run build`.
 

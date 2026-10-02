@@ -1,5 +1,5 @@
 name: Ninjas Gas Stations
-version: 0.1.0
+version: 0.1.1
 slug: ninjas_gas_stations
 description: Find nearby fuel stations and compare DGEG prices in Portugal
 url: https://github.com/noesisaoliveira/ninjas-gas-stations
@@ -8,6 +8,7 @@ image: ghcr.io/noesisaoliveira/ninjas-gas-stations
 arch:
   - amd64
   - aarch64
+  - armv7
 startup: application
 init: false
 ingress: true

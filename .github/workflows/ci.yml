@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up QEMU for aarch64
+      - name: Set up QEMU for ARM builds
         uses: docker/setup-qemu-action@v3
       - name: Build all add-on architectures
         run: >-
@@ -52,5 +52,5 @@ jobs:
           -v "${{ github.workspace }}/ninjas_gas_stations:/data"
           -v /var/run/docker.sock:/var/run/docker.sock:ro
           -v "$HOME/.docker:/root/.docker"
-          ghcr.io/home-assistant/amd64-builder:2025.11.0
-          --amd64 --aarch64 --test --target /data
+          ghcr.io/home-assistant/amd64-builder:2025.09.0
+          --amd64 --aarch64 --armv7 --test --target /data
