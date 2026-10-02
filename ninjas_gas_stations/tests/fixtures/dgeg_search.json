@@ -1,0 +1,32 @@
+{
+  "status": true,
+  "mensagem": "sucesso",
+  "resultado": [
+    {
+      "Id": 67360,
+      "Nome": "INTERMARCHE VILAR FORMOSO",
+      "Marca": "INTERMARCHÉ",
+      "Municipio": "Almeida",
+      "Morada": "Sitio da Represa",
+      "CodPostal": "6355-289",
+      "Combustivel": "Gasóleo simples",
+      "Preco": "1,939 €",
+      "DataAtualizacao": "2026-10-01 08:30",
+      "Latitude": 40.61817,
+      "Longitude": -6.84339
+    },
+    {
+      "Id": 67360,
+      "Nome": "INTERMARCHE VILAR FORMOSO",
+      "Marca": "INTERMARCHÉ",
+      "Municipio": "Almeida",
+      "Morada": "Sitio da Represa",
+      "CodPostal": "6355-289",
+      "Combustivel": "Gasolina simples 95",
+      "Preco": "1,999 €",
+      "DataAtualizacao": "2026-10-01 08:45",
+      "Latitude": 40.61817,
+      "Longitude": -6.84339
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+name: Release add-on images
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build-addon:
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish Home Assistant add-on
+        run: >-
+          docker run --rm --privileged
+          -v "${{ github.workspace }}/ninjas_gas_stations:/data"
+          -v "$HOME/.docker:/root/.docker:ro"
+          ghcr.io/home-assistant/amd64-builder:2025.11.0
+          --amd64 --aarch64 --target "ghcr.io/${{ github.repository_owner }}/ninjas-gas-stations"
+          --docker-hub ghcr.io

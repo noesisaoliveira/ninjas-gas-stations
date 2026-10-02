@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ninjas Gas Stations · Mock Home Assistant</title>
+    <style>
+      :root { color-scheme: light dark; font: 16px system-ui, sans-serif; background: #eef1ed; color: #202923; }
+      body { margin: 0 auto; max-width: 560px; padding: 24px 14px; }
+      main { background: #fff; border: 1px solid #d6ddd6; border-radius: 8px; padding: 4px; }
+      @media (prefers-color-scheme: dark) { :root { background: #171d1a; color: #edf1ed; } main { background: #202824; border-color: #38423c; } }
+    </style>
+    <script type="module" src="/src/index.ts"></script>
+  </head>
+  <body>
+    <main>
+      <ninjas-gas-stations-card></ninjas-gas-stations-card>
+    </main>
+    <script type="module">
+      await customElements.whenDefined("ninjas-gas-stations-card");
+      if (!location.search.includes("live=1")) {
+        const now = Date.now();
+        const sampleStations = [
+          ["101", "PRIO Alcântara", "PRIO", 1.529, 1.699, 1.4],
+          ["102", "Galp Avenida de Roma", "Galp", 1.559, 1.679, 2.1],
+          ["103", "Repsol Campo Grande", "Repsol", 1.579, 1.719, 3.2],
+          ["104", "BP Amoreiras", "BP", 1.609, 1.739, 4.0],
+          ["105", "Intermarché Benfica", "Intermarché", 1.549, 1.709, 4.8],
+        ].map(([id, name, brand, diesel, gasoline95, distance]) => ({
+          id, name, brand, municipality: "Lisboa", address: "Lisboa",
+          lat: 38.7223, lon: -9.1393, distance_km: distance,
+          prices: {
+            diesel: { label: "Gasóleo simples", price_eur: diesel, updated_at: new Date(now - 2_700_000).toISOString() },
+            gasoline95: { label: "Gasolina simples 95", price_eur: gasoline95, updated_at: new Date(now - 5_400_000).toISOString() },
+          },
+          opening_hours: null,
+          waze_url: "https://waze.com/ul?ll=38.7223,-9.1393&navigate=yes",
+          google_maps_url: "https://www.google.com/maps/dir/?api=1&destination=38.7223,-9.1393",
+          apple_maps_url: "https://maps.apple.com/?daddr=38.7223,-9.1393",
+        }));
+        const nativeFetch = window.fetch.bind(window);
+        window.fetch = async (input, init) => {
+          if (String(input).includes("/api/stations?")) {
+            const query = new URL(String(input)).searchParams;
+            const sort = query.get("sort") || "diesel";
+            const stations = [...sampleStations].sort((a, b) => sort === "distance"
+              ? a.distance_km - b.distance_km
+              : a.prices[sort].price_eur - b.prices[sort].price_eur);
+            return new Response(JSON.stringify({ stations: stations.slice(0, Number(query.get("limit") || 5)), stale: false, last_refresh: new Date().toISOString() }), {
+              headers: { "Content-Type": "application/json" },
+            });
+          }
+          return nativeFetch(input, init);
+        };
+      }
+      const card = document.querySelector("ninjas-gas-stations-card");
+      card.setConfig({
+        type: "custom:ninjas-gas-stations-card",
+        title: "Nearby fuel",
+        entity: "person.demo",
+        api_url: "http://127.0.0.1:8099",
+        api_token: "local-dev-token",
+        radius_km: 15,
+        limit: 5,
+        fuels: ["diesel", "gasoline95"],
+        sort_by: "diesel",
+        navigation_app: "waze",
+        show_brand_logo: true,
+      });
+      card.hass = {
+        language: "en",
+        states: {
+          "person.demo": {
+            state: "home",
+            attributes: { latitude: 38.7223, longitude: -9.1393 },
+          },
+        },
+      };
+    </script>
+  </body>
+</html>

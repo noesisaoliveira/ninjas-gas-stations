@@ -1,0 +1,7 @@
+{
+  "name": "Ninjas Gas Stations Card",
+  "render_readme": true,
+  "filename": "ninjas-gas-stations-card.js",
+  "content_in_root": true,
+  "homeassistant": "2025.11.0"
+}

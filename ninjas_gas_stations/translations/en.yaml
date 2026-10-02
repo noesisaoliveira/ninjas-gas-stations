@@ -1,0 +1,24 @@
+configuration:
+  default_radius_km:
+    name: Default radius (km)
+    description: Search radius used when the card does not specify one.
+  default_limit:
+    name: Default result limit
+  cache_ttl_minutes:
+    name: Cache lifetime (minutes)
+    description: DGEG results are reused for this duration and kept on disk for outages.
+  brands_include:
+    name: Included brands
+  brands_exclude:
+    name: Excluded brands
+  api_token:
+    name: Direct API token
+    description: Required for direct API requests. Leave blank to disable direct access.
+  allowed_origins:
+    name: Allowed browser origins
+    description: Comma-separated exact origins, for example https://home.example.com.
+  trusted_ingress_cidrs:
+    name: Trusted Home Assistant ingress networks
+    description: CIDRs allowed to use Supervisor ingress without the direct API token. Default is 172.30.32.2/32.
+  log_level:
+    name: Log level

@@ -1,0 +1,22 @@
+{
+  "name": "ninjas-gas-stations-card",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node -e \"require('node:fs').copyFileSync('dist/ninjas-gas-stations-card.js', '../ninjas-gas-stations-card.js')\"",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lit": "3.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.30",
+    "jsdom": "26.1.0",
+    "typescript": "5.8.3",
+    "vite": "6.4.3",
+    "vitest": "5.0.3"
+  }
+}

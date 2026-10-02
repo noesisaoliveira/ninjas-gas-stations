@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ninjas_gas_stations
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: ninjas_gas_stations/requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check app tests
+      - run: black --check app tests
+      - run: mypy app
+      - run: pytest -q
+
+  card:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ninjas-gas-stations-card
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ninjas-gas-stations-card/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  addon-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build all add-on architectures
+        run: >-
+          docker run --rm --privileged
+          -v "${{ github.workspace }}/ninjas_gas_stations:/data"
+          ghcr.io/home-assistant/amd64-builder:2025.11.0
+          --amd64 --aarch64 --test --target "ghcr.io/${{ github.repository_owner }}/ninjas-gas-stations"

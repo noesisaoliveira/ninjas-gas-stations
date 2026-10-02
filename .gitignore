@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+ninjas-gas-stations-card/dist/
+ninjas_gas_stations/.coverage
+ninjas_gas_stations/data/
