@@ -51,5 +51,6 @@ jobs:
           docker run --rm --privileged
           -v "${{ github.workspace }}/ninjas_gas_stations:/data"
           -v /var/run/docker.sock:/var/run/docker.sock:ro
+          -v "$HOME/.docker:/root/.docker"
           ghcr.io/home-assistant/amd64-builder:2025.11.0
           --amd64 --aarch64 --test --target /data
