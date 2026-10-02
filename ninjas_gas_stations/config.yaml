@@ -4,6 +4,7 @@ slug: ninjas_gas_stations
 description: Find nearby fuel stations and compare DGEG prices in Portugal
 url: https://github.com/noesisaoliveira/ninjas-gas-stations
 homeassistant: 2025.11.0
+image: ghcr.io/noesisaoliveira/ninjas-gas-stations
 arch:
   - amd64
   - aarch64

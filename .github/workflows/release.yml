@@ -24,5 +24,4 @@ jobs:
           -v "${{ github.workspace }}/ninjas_gas_stations:/data"
           -v "$HOME/.docker:/root/.docker:ro"
           ghcr.io/home-assistant/amd64-builder:2025.11.0
-          --amd64 --aarch64 --target "ghcr.io/${{ github.repository_owner }}/ninjas-gas-stations"
-          --docker-hub ghcr.io
+          --amd64 --aarch64 --target /data
