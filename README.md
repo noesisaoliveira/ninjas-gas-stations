@@ -2,7 +2,7 @@
 
 Home Assistant add-on and Lovelace card for comparing nearby Portuguese fuel prices from the official DGEG service.
 
-Validated for Home Assistant Core 2025.11+, Supervisor 2025.11+, and Home Assistant OS 16.x. Supported architectures are `amd64`, `aarch64`, and `armv7` (including Raspberry Pi 3). The CI uses the Home Assistant 2025.09 builder because 2025.11 dropped armv7 build support.
+Validated for Home Assistant Core 2025.11+, Supervisor 2025.11+, and Home Assistant OS 16.x. Supported architectures are `amd64`, `aarch64`, and `armv7` (including Raspberry Pi 3). Each architecture has its own GHCR image tag. The CI uses the Home Assistant 2025.09 builder because 2025.11 dropped armv7 build support.
 
 Screenshots for light and dark themes will be added after Companion-app validation.
 

@@ -175,7 +175,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await provider.close()
 
 
-app = FastAPI(title="Ninjas Gas Stations", version="0.1.1", lifespan=lifespan)
+app = FastAPI(title="Ninjas Gas Stations", version="0.1.2", lifespan=lifespan)
 _request_times: dict[str, list[float]] = {}
 
 
