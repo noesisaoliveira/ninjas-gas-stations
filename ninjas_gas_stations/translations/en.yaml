@@ -14,6 +14,15 @@ configuration:
   api_token:
     name: Direct API token
     description: Required for direct API requests. Leave blank to disable direct access.
+  ssl:
+    name: Enable native HTTPS
+    description: Keep Home Assistant ingress on HTTP and enable direct HTTPS on port 8443.
+  certfile:
+    name: TLS certificate filename
+    description: Certificate chain filename inside Home Assistant's /ssl directory.
+  keyfile:
+    name: TLS private key filename
+    description: Private key filename inside Home Assistant's /ssl directory.
   allowed_origins:
     name: Allowed browser origins
     description: Comma-separated exact origins, for example https://home.example.com.

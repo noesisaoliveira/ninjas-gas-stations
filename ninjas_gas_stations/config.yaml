@@ -1,5 +1,5 @@
 name: Ninjas Gas Stations
-version: 0.1.4
+version: 0.1.5
 slug: ninjas_gas_stations
 description: Find nearby fuel stations and compare DGEG prices in Portugal
 url: https://github.com/noesisaoliveira/ninjas-gas-stations
@@ -18,10 +18,13 @@ panel_title: Gas Stations
 map:
   - type: data
     read_only: false
+  - type: ssl
 ports:
   8099/tcp: null
+  8443/tcp: null
 ports_description:
-  8099/tcp: Optional direct API access. Configure an API token before exposing.
+  8099/tcp: Optional direct HTTP API access. Configure an API token before exposing.
+  8443/tcp: Optional native HTTPS API access when SSL is enabled.
 options:
   default_radius_km: 15
   default_limit: 5
@@ -29,6 +32,9 @@ options:
   brands_include: []
   brands_exclude: []
   api_token: ""
+  ssl: false
+  certfile: fullchain.pem
+  keyfile: privkey.pem
   allowed_origins: ""
   trusted_ingress_cidrs:
     - 172.30.32.2/32
@@ -42,6 +48,9 @@ schema:
   brands_exclude:
     - str
   api_token: password
+  ssl: bool
+  certfile: str
+  keyfile: str
   allowed_origins: str
   trusted_ingress_cidrs:
     - str
