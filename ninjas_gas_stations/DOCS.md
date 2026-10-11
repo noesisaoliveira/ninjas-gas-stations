@@ -7,10 +7,11 @@ Find nearby fuel stations in Portugal using public prices from the official DGEG
 1. Open **Settings → Add-ons → Ninjas Gas Stations → Configuration**.
 2. Set `default_radius_km` and `default_limit` if you want defaults other than 15 km and 5 stations. The Lovelace card can override both.
 3. For a dashboard card that calls the API directly, enter a unique random value in `api_token`. Keep this token private; the card must send the same value as a Bearer token.
-4. Set `allowed_origins` to the exact origin used to open your Home Assistant dashboard. Include the scheme and port, but no path or trailing slash. Examples: `http://homeassistant.local:8123` or `https://olivehe.duckdns.org`.
+4. Set `allowed_origins` to the exact origin used to open your Home Assistant dashboard. Include the scheme and port, but no path or trailing slash. Examples: `http://homeassistant.local:8123` or `https://ha.example.com:8443`.
 5. If the dashboard is HTTPS or you need remote access, enable `ssl`, leave `certfile` as `fullchain.pem` and `keyfile` as `privkey.pem` (unless your certificate files use different names), and make sure those files exist in Home Assistant's `/ssl` directory. They are mounted read-only into this add-on. Direct TLS listens on port `8443`; Supervisor ingress remains HTTP on internal port `8099`.
-6. In the add-on's **Network** section, map `8443/tcp` to host port `8443`. For remote access, configure your router to forward TCP port `8443` to the Home Assistant host's port `8443`. The certificate must be valid for the hostname in the card URL. Keep the API token enabled.
-7. Save the configuration and start or restart the add-on. Test direct TLS from a network terminal with `curl -H "Authorization: Bearer <your-token>" https://olivehe.duckdns.org:8443/api/health`.
+6. In the add-on's **Network** section, map container port `8443/tcp` to a free Home Assistant host port, for example `8444`. Make sure you are editing the `8443/tcp` row, not the `8099/tcp` HTTP row.
+7. For remote access, forward an unused external TCP port (for example `9443`) on your router to `<home-assistant-LAN-IP>:8444`. Keep any existing Home Assistant UI rule (often external `8443` to internal `8123`) unchanged. The TLS certificate must be valid for the hostname used in the card URL. Keep the API token enabled.
+8. Save the configuration and start or restart the add-on. Test direct TLS with `curl -H "Authorization: Bearer <your-token>" https://<your-domain>:9443/api/health`, replacing the example external port if you chose another one. A `401` response without a token is expected and confirms that HTTPS reached the API.
 
 For a LAN-only dashboard loaded over HTTP, you may leave `ssl` disabled and map HTTP port `8099` instead. An HTTPS dashboard cannot call a plain HTTP API because browsers block mixed content. The add-on's ingress panel stays available on port `8099` and is authenticated by Home Assistant; its temporary ingress URL is not a stable API URL for the card.
 
@@ -22,7 +23,7 @@ Install the **Ninjas Gas Stations Card** from HACS as a custom Dashboard reposit
 type: custom:ninjas-gas-stations-card
 title: Ninjas Gas Stations
 entity: device_tracker.your_phone
-api_url: https://olivehe.duckdns.org:8443
+api_url: https://<your-domain>:9443
 api_token: YOUR_CONFIGURED_API_TOKEN
 radius_km: 15
 limit: 5
@@ -34,7 +35,7 @@ navigation_app: waze
 show_brand_logo: true
 ```
 
-Replace `device_tracker.your_phone` with the Companion app's location entity or a `person.*` entity. Replace the API URL with the certificate-covered HTTPS hostname and port `8443` reachable from the phone or browser. Set `allowed_origins` to the exact Home Assistant dashboard origin (usually the same hostname without `:8443`). Do not put a long-lived token in a dashboard shared with untrusted users.
+Replace `device_tracker.your_phone` with the Companion app's location entity or a `person.*` entity. Replace the API URL with the certificate-covered hostname and external router port (for example, `https://ha.example.com:9443`). The API URL port is the router's external port, not the add-on's internal port `8443`. Set `allowed_origins` to the exact Home Assistant dashboard origin, including its own port if nonstandard; it may differ from the API URL origin. Do not put a long-lived token in a dashboard shared with untrusted users.
 
 In the Companion app, enable location tracking and grant location permission. Confirm the entity has numeric `latitude` and `longitude` attributes. If entity coordinates are unavailable, the card can request browser geolocation as a fallback.
 

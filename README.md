@@ -13,7 +13,7 @@ Screenshots for light and dark themes will be added after Companion-app validati
 3. Install the card from HACS as a custom **Dashboard** repository using the same repository. If distributing this monorepo, ensure the release contains the generated root `ninjas-gas-stations-card.js` bundle.
 4. In **Settings → Dashboards → Resources**, add `/hacsfiles/ninjas-gas-stations/ninjas-gas-stations-card.js` as a JavaScript module if HACS has not registered it.
 
-The add-on is not exposed on a host port by default. For card-to-API calls, set a dedicated `api_token`, add your exact Home Assistant origin to `allowed_origins`, and map the add-on port only on a trusted network or behind a TLS reverse proxy. Use the same API base URL and token in the card. Do not use an HTTP endpoint over the public internet.
+The add-on is not exposed on a host port by default. For direct card access, set a dedicated `api_token`, enable native `ssl` using certificate files in Home Assistant's `/ssl` directory, map container port `8443/tcp` to a free host port (for example `8444`), and set `allowed_origins` to your exact dashboard origin. If remote access is needed, forward an unused router port (for example `9443`) to the HA host's mapped port. The card uses the HTTPS hostname and external port; do not expose plain HTTP `8099` publicly. Keep the existing Home Assistant UI router rule unchanged.
 
 ## Card YAML
 
@@ -21,7 +21,7 @@ The add-on is not exposed on a host port by default. For card-to-API calls, set 
 type: custom:ninjas-gas-stations-card
 title: Ninjas Gas Stations
 entity: person.alex
-api_url: https://gas-api.example.net
+api_url: https://ha.example.com:9443
 api_token: !secret ninjas_gas_api_token
 radius_km: 15
 limit: 5
