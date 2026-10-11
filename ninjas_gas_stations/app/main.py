@@ -175,7 +175,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await provider.close()
 
 
-app = FastAPI(title="Ninjas Gas Stations", version="0.1.3", lifespan=lifespan)
+app = FastAPI(title="Ninjas Gas Stations", version="0.1.4", lifespan=lifespan)
 _request_times: dict[str, list[float]] = {}
 
 
@@ -192,6 +192,18 @@ def _is_trusted_ingress_request(request: Request, options: dict[str, Any]) -> bo
         return False
 
 
+def _authorization_matches(authorization: str, token: str) -> bool:
+    expected = f"Bearer {token}".encode()
+    candidates = [authorization]
+    try:
+        decoded = authorization.encode("latin-1").decode("utf-8")
+        if decoded != authorization:
+            candidates.append(decoded)
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        pass
+    return any(secrets.compare_digest(candidate.encode(), expected) for candidate in candidates)
+
+
 @app.middleware("http")
 async def protect_api(request: Request, call_next: RequestResponseEndpoint) -> Response:
     if request.url.path.startswith("/api/") and request.method != "OPTIONS":
@@ -199,9 +211,7 @@ async def protect_api(request: Request, call_next: RequestResponseEndpoint) -> R
         token = str(options.get("api_token", ""))
         ingress_request = _is_trusted_ingress_request(request, options)
         authorization = request.headers.get("authorization", "")
-        if not ingress_request and (
-            not token or not secrets.compare_digest(authorization, f"Bearer {token}")
-        ):
+        if not ingress_request and (not token or not _authorization_matches(authorization, token)):
             return JSONResponse(
                 {"detail": "A configured add-on API token is required"}, status_code=401
             )

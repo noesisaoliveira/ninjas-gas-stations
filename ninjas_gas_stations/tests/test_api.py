@@ -47,7 +47,7 @@ def test_api_requires_token_for_direct_requests(tmp_path, monkeypatch) -> None:
 
     options_path = tmp_path / "options.json"
     options_path.write_text(
-        json.dumps({"api_token": "test-token", "allowed_origins": ""}),
+        json.dumps({"api_token": "päss-token", "allowed_origins": ""}),
         encoding="utf-8",
     )
     monkeypatch.setattr(main, "OPTIONS_PATH", options_path)
@@ -63,10 +63,10 @@ def test_api_requires_token_for_direct_requests(tmp_path, monkeypatch) -> None:
             ).status_code
             == 401
         )
-        response = client.get("/api/meta", headers={"Authorization": "Bearer test-token"})
+        response = client.get("/api/meta", headers={"Authorization": b"Bearer p\xe4ss-token"})
         stations = client.get(
             "/api/stations?lat=38.7223&lon=-9.1393&radius_km=15&sort=diesel",
-            headers={"Authorization": "Bearer test-token"},
+            headers={"Authorization": b"Bearer p\xe4ss-token"},
         )
 
     assert response.status_code == 200
