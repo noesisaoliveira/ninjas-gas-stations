@@ -17,12 +17,16 @@ For a LAN-only dashboard loaded over HTTP, you may leave `ssl` disabled and map 
 
 ## Connect the Lovelace Card
 
-Install the **Ninjas Gas Stations Card** from HACS as a custom Dashboard repository, then add it as a manual card:
+1. Open **HACS** in Home Assistant.
+2. Open the **⋮** menu and select **Custom repositories**.
+3. Add `https://github.com/noesisaoliveira/ninjas-gas-stations` and choose **Dashboard** as the category, then select **Add**.
+4. Return to HACS, find **Ninjas Gas Stations Card**, open it, and select **Download**. Reload the Home Assistant page or Companion app when prompted.
+5. If the card is not recognized after reloading, open **Settings → Dashboards → ⋮ → Resources** and add `/hacsfiles/ninjas-gas-stations/ninjas-gas-stations-card.js` as a JavaScript module.
+6. Add a **Manual** card to a dashboard and paste this YAML:
 
 ```yaml
 type: custom:ninjas-gas-stations-card
 title: Ninjas Gas Stations
-entity: device_tracker.your_phone
 api_url: https://<your-domain>:9443
 api_token: YOUR_CONFIGURED_API_TOKEN
 radius_km: 15
@@ -35,9 +39,9 @@ navigation_app: waze
 show_brand_logo: true
 ```
 
-Replace `device_tracker.your_phone` with the Companion app's location entity or a `person.*` entity. Replace the API URL with the certificate-covered hostname and external router port (for example, `https://ha.example.com:9443`). The API URL port is the router's external port, not the add-on's internal port `8443`. Set `allowed_origins` to the exact Home Assistant dashboard origin, including its own port if nonstandard; it may differ from the API URL origin. Do not put a long-lived token in a dashboard shared with untrusted users.
+You do not need an `entity` setting when using the iPhone's location permission prompt; leave `entity` out and the card gets the phone's location from the browser or Home Assistant Companion app. To use Home Assistant's location entity instead, optionally add `entity: device_tracker.your_phone` or `entity: person.your_name`. Replace the API URL with the certificate-covered hostname and external router port (for example, `https://ha.example.com:9443`). The API URL port is the router's external port, not the add-on's internal port `8443`. Set `allowed_origins` to the exact Home Assistant dashboard origin, including its own port if nonstandard; it may differ from the API URL origin. Do not put a long-lived token in a dashboard shared with untrusted users.
 
-In the Companion app, enable location tracking and grant location permission. Confirm the entity has numeric `latitude` and `longitude` attributes. If entity coordinates are unavailable, the card can request browser geolocation as a fallback.
+If you use an entity, enable Companion location tracking and confirm that the entity has numeric `latitude` and `longitude` attributes. When no entity is configured, the card uses browser/Companion geolocation directly.
 
 ## Add-on Options
 

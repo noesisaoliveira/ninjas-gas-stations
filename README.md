@@ -9,9 +9,11 @@ Screenshots for light and dark themes will be added after Companion-app validati
 ## Install
 
 1. Add `https://github.com/noesisaoliveira/ninjas-gas-stations` to **Settings → Add-ons → Add-on store → ⋮ → Repositories**.
-2. Install **Ninjas Gas Stations**, configure the radius/cache and an API token if using direct access, then start the add-on.
-3. Install the card from HACS as a custom **Dashboard** repository using the same repository. If distributing this monorepo, ensure the release contains the generated root `ninjas-gas-stations-card.js` bundle.
-4. In **Settings → Dashboards → Resources**, add `/hacsfiles/ninjas-gas-stations/ninjas-gas-stations-card.js` as a JavaScript module if HACS has not registered it.
+2. Install **Ninjas Gas Stations**, configure its settings, then start the add-on.
+3. In **HACS**, open **⋮ → Custom repositories**. Add the same GitHub URL, select **Dashboard**, and choose **Add**.
+4. Find **Ninjas Gas Stations Card** in HACS and select **Download**. Reload Home Assistant or the Companion app when prompted.
+5. If the card is not recognized after reloading, go to **Settings → Dashboards → ⋮ → Resources** and add `/hacsfiles/ninjas-gas-stations/ninjas-gas-stations-card.js` as a JavaScript module.
+6. Add a **Manual** card to a dashboard and use the YAML example below. The generated `ninjas-gas-stations-card.js` bundle is already included at the repository root for HACS.
 
 The add-on is not exposed on a host port by default. For direct card access, set a dedicated `api_token`, enable native `ssl` using certificate files in Home Assistant's `/ssl` directory, map container port `8443/tcp` to a free host port (for example `8444`), and set `allowed_origins` to your exact dashboard origin. If remote access is needed, forward an unused router port (for example `9443`) to the HA host's mapped port. The card uses the HTTPS hostname and external port; do not expose plain HTTP `8099` publicly. Keep the existing Home Assistant UI router rule unchanged.
 
@@ -20,7 +22,6 @@ The add-on is not exposed on a host port by default. For direct card access, set
 ```yaml
 type: custom:ninjas-gas-stations-card
 title: Ninjas Gas Stations
-entity: person.alex
 api_url: https://ha.example.com:9443
 api_token: !secret ninjas_gas_api_token
 radius_km: 15
@@ -33,7 +34,7 @@ navigation_app: waze
 show_brand_logo: true
 ```
 
-Configure the Companion app's location sensor (`device_tracker.*`) or a `person.*` entity and grant location permission. If entity coordinates are unavailable, the card asks for browser geolocation when visible. Waze is opened using its app URL scheme, with an HTTPS fallback; iOS/Android may show a system confirmation depending on Companion/browser version.
+You do not need an `entity` setting when using the iPhone's location permission prompt; leave it out and the card asks the browser or Companion app for location. To use Home Assistant's location entity instead, optionally add `entity: person.your_name` or `entity: device_tracker.your_phone` and enable Companion location tracking. Waze is opened using its app URL scheme, with an HTTPS fallback; iOS/Android may show a system confirmation depending on Companion/browser version.
 
 ## Configuration
 
