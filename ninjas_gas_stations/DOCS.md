@@ -44,7 +44,7 @@ navigation_app: waze
 show_brand_logo: true
 ```
 
-The card's `estimate` setting is the number of litres used for the per-station total (30 by default). Each displayed fuel also shows the extra cost versus the cheapest station in the current list; in **Nearest** mode, this comparison is made separately for each fuel. Set `trump: true` to show `BeforeTrumpWar`, which compares that fill with fixed historical reference prices in €/L: diesel `1.583`, dieselprime `1.623`, gasoline95 `1.684`, gasolineprime `1.794`, and gplauto `0.818`. A positive value means the estimated fill costs more than that reference; a negative value means it costs less. These baselines are static and do not come from DGEG. It is hidden by default (`trump: false`).
+The card's `estimate` setting is the number of litres used for the per-station total (30 by default). Each displayed fuel also shows the extra cost versus the cheapest station in the current list; in **Nearest** mode, this comparison is made separately for each fuel. Set `trump: true` to show `BeforeTrumpWar`, which compares that fill with fixed historical reference prices in €/L: diesel `1.583`, dieselprime `1.623`, gasoline95 `1.684`, gasolineprime `1.794`, and gplauto `0.818`. A negative value means the estimated fill costs more than that reference; a positive value means it costs less. These baselines are static and do not come from DGEG. It is hidden by default (`trump: false`).
 
 When sorted by a fuel, the card shows only that fuel's price to keep station rows compact. Select **Nearest** to show prices for all fuels configured above.
 

@@ -677,7 +677,7 @@ function ng(C, A, g) {
   };
 }
 function cg(C, A, g) {
-  return Math.round((A - sg[C]) * g * 100) / 100;
+  return Math.round((sg[C] - A) * g * 100) / 100;
 }
 function Pg(C, A) {
   const g = A?.toLowerCase().startsWith("pt");

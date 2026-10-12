@@ -2,6 +2,10 @@
 
 Notable changes to Ninjas Gas Stations are documented here. Versions are listed newest first.
 
+## 0.1.13 - 2026-10-12
+
+- Corrected `BeforeTrumpWar` sign: higher current fuel prices than the historical baseline now show a negative estimated difference.
+
 ## 0.1.12 - 2026-10-12
 
 - Added a `trump` card setting, disabled by default, to optionally show the estimated fill-cost difference from the fixed historical fuel prices.

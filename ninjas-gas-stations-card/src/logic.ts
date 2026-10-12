@@ -51,7 +51,7 @@ export function fuelEstimate(price: number, prices: number[], liters: number): {
 }
 
 export function beforeTrumpWarDifference(fuel: FuelKey, currentPrice: number, liters: number): number {
-  return Math.round((currentPrice - HISTORICAL_FUEL_PRICES[fuel]) * liters * 100) / 100;
+  return Math.round((HISTORICAL_FUEL_PRICES[fuel] - currentPrice) * liters * 100) / 100;
 }
 
 export function fuelName(key: FuelKey, language?: string): string {

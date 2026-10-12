@@ -87,8 +87,8 @@ describe("card logic", () => {
       gasolineprime: 1.794,
       gplauto: 0.818,
     });
-    expect(beforeTrumpWarDifference("diesel", 2.25, 30)).toBe(20.01);
-    expect(beforeTrumpWarDifference("diesel", 1.5, 30)).toBe(-2.49);
+    expect(beforeTrumpWarDifference("diesel", 1.989, 30)).toBe(-12.18);
+    expect(beforeTrumpWarDifference("diesel", 1.5, 30)).toBe(2.49);
     expect(beforeTrumpWarDifference("gplauto", 0.818, 30)).toBe(0);
   });
 });
