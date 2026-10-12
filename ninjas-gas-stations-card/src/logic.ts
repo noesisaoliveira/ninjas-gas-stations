@@ -34,6 +34,15 @@ export function priceLevel(price: number, prices: number[]): "low" | "mid" | "hi
   return "mid";
 }
 
+export function fuelEstimate(price: number, prices: number[], liters: number): { total: number; difference: number } {
+  const cheapest = prices.length > 0 ? Math.min(...prices) : price;
+  const roundCurrency = (amount: number) => Math.round((amount + Number.EPSILON) * 100) / 100;
+  return {
+    total: roundCurrency(price * liters),
+    difference: roundCurrency(Math.max(0, (price - cheapest) * liters)),
+  };
+}
+
 export function fuelName(key: FuelKey, language?: string): string {
   const portuguese = language?.toLowerCase().startsWith("pt");
   if (key === "diesel") return portuguese ? "Gasóleo simples" : "Diesel";

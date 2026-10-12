@@ -40,6 +40,7 @@ export interface CardConfig {
   api_token?: string;
   radius_km: number;
   limit: number;
+  estimate: number;
   fuels: FuelKey[];
   sort_by: SortMode;
   navigation_app: "waze" | "google" | "apple";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { brandMark } from "./brand-icons";
-import { displayedFuels, entityLocation, FUEL_KEYS, priceLevel, SORT_MODES, sortStations } from "./logic";
+import { displayedFuels, entityLocation, fuelEstimate, FUEL_KEYS, priceLevel, SORT_MODES, sortStations } from "./logic";
 import type { Station } from "./types";
 
 const station = (id: string, distance: number, diesel?: number): Station => ({
@@ -23,7 +23,16 @@ describe("card logic", () => {
   it("uses bundled logos for known brands and no initials for unknown brands", () => {
     expect(brandMark("INTERMARCHÉ")).toBeDefined();
     expect(brandMark("E.Leclerc")).toBeDefined();
-    expect(brandMark("Galp")).toBeUndefined();
+    expect(brandMark("Galp")).toHaveProperty("image");
+    expect(brandMark("Repsol")).toHaveProperty("image");
+    expect(brandMark("PRIO")).toHaveProperty("image");
+    expect(brandMark("Moeve")).toHaveProperty("image");
+    expect(brandMark("CEPSA")).toHaveProperty("image");
+    expect(brandMark("Alves Bandeira")).toHaveProperty("image");
+    expect(brandMark("OZ Energia")).toHaveProperty("image");
+    expect(brandMark("Plenergy")).toHaveProperty("image");
+    expect(brandMark("Plenoil")).toHaveProperty("image");
+    expect(brandMark("BP")).toHaveProperty("image");
     expect(brandMark("Genérico")).toBeUndefined();
   });
 
@@ -63,5 +72,10 @@ describe("card logic", () => {
   it("assigns relative price levels", () => {
     expect(priceLevel(1, [1, 2, 3])).toBe("low");
     expect(priceLevel(3, [1, 2, 3])).toBe("high");
+  });
+
+  it("estimates total fuel cost and rounds the difference to cents", () => {
+    expect(fuelEstimate(1.734, [1.7, 1.734], 30)).toEqual({ total: 52.02, difference: 1.02 });
+    expect(fuelEstimate(1.7, [1.7, 1.734], 30)).toEqual({ total: 51, difference: 0 });
   });
 });

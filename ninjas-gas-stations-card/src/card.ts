@@ -1,12 +1,13 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { brandMark } from "./brand-icons";
-import { displayedFuels, entityLocation, FUEL_KEYS, fuelName, priceLevel, relativeUpdatedAt, SORT_MODES, sortStations } from "./logic";
+import { displayedFuels, entityLocation, FUEL_KEYS, fuelEstimate, fuelName, priceLevel, relativeUpdatedAt, SORT_MODES, sortStations } from "./logic";
 import type { CardConfig, FuelKey, HomeAssistant, SortMode, StationsResponse, Station } from "./types";
 
 const DEFAULT_CONFIG: Omit<CardConfig, "type" | "api_url"> = {
   radius_km: 15,
   limit: 5,
+  estimate: 30,
   fuels: ["diesel", "gasoline95"],
   sort_by: "diesel",
   navigation_app: "waze",
@@ -54,7 +55,7 @@ export class NinjasGasStationsCard extends LitElement {
     .row:last-child { border-bottom:0; }
     .rank { color:var(--secondary-text-color); font-size:.82rem; text-align:center; }
     .brand { align-items:center; background:var(--card-background-color, #fff); border:1px solid var(--divider-color); border-radius:8px; display:flex; height:40px; justify-content:center; overflow:hidden; width:40px; }
-    .brand svg { display:block; height:25px; width:25px; }
+    .brand svg,.brand img { display:block; height:25px; object-fit:contain; width:25px; }
     .brand-fallback { color:var(--secondary-text-color); height:25px; width:25px; }
     .details { min-width:0; }
     .name { font-size:.91rem; font-weight:600; line-height:1.25; overflow-wrap:anywhere; }
@@ -76,7 +77,7 @@ export class NinjasGasStationsCard extends LitElement {
       .row { align-items:start; gap:7px; grid-template-columns:22px 36px minmax(0,1fr) 70px; padding:14px 4px; }
       .rank { grid-column:1; grid-row:1 / span 2; padding-top:7px; }
       .brand { grid-column:2; grid-row:1; height:34px; width:34px; }
-      .brand svg,.brand-fallback { height:22px; width:22px; }
+      .brand svg,.brand img,.brand-fallback { height:22px; width:22px; }
       .details { grid-column:3; grid-row:1; }
       .prices { align-items:flex-start; display:flex; flex-wrap:wrap; gap:8px 14px; grid-column:3; grid-row:2; justify-content:flex-start; min-width:0; padding-top:7px; }
       .price { font-size:.8rem; text-align:left; }
@@ -94,6 +95,9 @@ export class NinjasGasStationsCard extends LitElement {
     this._config = {
       ...DEFAULT_CONFIG,
       ...config,
+      estimate: Number.isFinite(config.estimate) && (config.estimate ?? 0) > 0
+        ? config.estimate!
+        : DEFAULT_CONFIG.estimate,
       fuels,
       sort_by: sortBy,
       type: "custom:ninjas-gas-stations-card",
@@ -228,10 +232,17 @@ export class NinjasGasStationsCard extends LitElement {
     if (!price) return nothing;
     const values = group.map((item) => item.prices[fuel]?.price_eur).filter((value): value is number => value !== undefined);
     const cheapest = values.length > 0 && price.price_eur === Math.min(...values);
+    const estimate = fuelEstimate(price.price_eur, values, this._config?.estimate ?? DEFAULT_CONFIG.estimate);
+    const currency = (amount: number) => new Intl.NumberFormat(this._hass?.language ?? "pt-PT", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount);
     return html`<div class="price ${priceLevel(price.price_eur, values)}">
       ${price.price_eur.toFixed(3)} €/l<small>${fuelName(fuel, this._hass?.language)}</small>
       ${fuel === "gasolineprime" ? html`<small>${price.label}</small>` : nothing}
       <small>${relativeUpdatedAt(price.updated_at, this._hass?.language)}</small>
+      <small>${this._config?.estimate ?? DEFAULT_CONFIG.estimate} L total: ${currency(estimate.total)}</small>
+      ${estimate.difference > 0 ? html`<small>Diff: +${currency(estimate.difference)}</small>` : nothing}
       ${cheapest ? html`<span class="cheapest">${this._hass?.language?.startsWith("pt") ? "Mais barato" : "Cheapest"}</span>` : nothing}
     </div>`;
   }
@@ -239,8 +250,10 @@ export class NinjasGasStationsCard extends LitElement {
   private renderBrand(station: Station) {
     const mark = brandMark(station.brand);
     return html`<span class="brand" role="img" aria-label=${station.brand || station.name} title=${station.brand || station.name}>
-      ${mark
-        ? html`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill=${`#${mark.hex}`} d=${mark.path}></path></svg>`
+      ${mark && "image" in mark
+        ? html`<img src=${mark.image} alt="" />`
+        : mark && "icon" in mark
+          ? html`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill=${`#${mark.icon.hex}`} d=${mark.icon.path}></path></svg>`
         : html`<svg class="brand-fallback" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 22V3h10v19H5Zm2-2h6V5H7v15Zm9-12h1.5l2.5 2.5V17a2 2 0 0 1-4 0v-2h2v2a.5.5 0 0 0 1 0v-5.7L16 10V8ZM8 7h4v4H8V7Z"></path></svg>`}
     </span>`;
   }

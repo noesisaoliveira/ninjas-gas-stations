@@ -31,6 +31,7 @@ api_url: https://<your-domain>:9443
 api_token: YOUR_CONFIGURED_API_TOKEN
 radius_km: 15
 limit: 5
+estimate: 30
 fuels:
   - diesel
   - gasoline95
@@ -41,6 +42,8 @@ sort_by: diesel
 navigation_app: waze
 show_brand_logo: true
 ```
+
+The card's `estimate` setting is the number of litres used for the per-station total (30 by default). Each displayed fuel also shows the extra cost versus the cheapest station in the current list; in **Nearest** mode, this comparison is made separately for each fuel.
 
 When sorted by a fuel, the card shows only that fuel's price to keep station rows compact. Select **Nearest** to show prices for all fuels configured above.
 

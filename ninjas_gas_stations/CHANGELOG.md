@@ -2,6 +2,11 @@
 
 Notable changes to Ninjas Gas Stations are documented here. Versions are listed newest first.
 
+## 0.1.11 - 2026-10-12
+
+- Added a configurable `estimate` litre amount to the Lovelace card, with per-station total cost and the difference from the cheapest visible station.
+- Bundled additional station marks for Galp, Repsol, PRIO, Moeve/CEPSA, Alves Bandeira, OZ Energia, Plenergy/Plenoil, and BP.
+
 ## 0.1.10 - 2026-10-12
 
 - Added GPL Auto as a standalone fuel tab and price returned by the API.

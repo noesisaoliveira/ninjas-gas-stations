@@ -19,6 +19,7 @@ export class NinjasGasStationsCardEditor extends LitElement {
       { name: "api_token", selector: { text: { type: "password" } } },
       { name: "radius_km", selector: { number: { min: 1, max: 500, step: 1, mode: "box", unit_of_measurement: "km" } } },
       { name: "limit", selector: { number: { min: 1, max: 20, step: 1, mode: "box" } } },
+      { name: "estimate", selector: { number: { min: 1, max: 1000, step: 1, mode: "box", unit_of_measurement: "L" } } },
       { name: "fuels", selector: { select: { multiple: true, options: [{ value: "diesel", label: "Gasóleo simples" }, { value: "gasoline95", label: "Gasolina simples 95" }, { value: "dieselprime", label: "Gasóleo especial" }, { value: "gasolineprime", label: "Lowest: Gasolina 98 / especial 95 / especial 98" }, { value: "gplauto", label: "GPL Auto" }] } } },
       { name: "sort_by", selector: { select: { options: [{ value: "diesel", label: "Cheapest diesel" }, { value: "gasoline95", label: "Cheapest gasoline 95" }, { value: "dieselprime", label: "Cheapest premium diesel" }, { value: "gasolineprime", label: "Cheapest premium gasoline" }, { value: "gplauto", label: "Cheapest GPL Auto" }, { value: "distance", label: "Nearest" }] } } },
       { name: "navigation_app", selector: { select: { options: [{ value: "waze", label: "Waze" }, { value: "google", label: "Google Maps" }, { value: "apple", label: "Apple Maps" }] } } },
