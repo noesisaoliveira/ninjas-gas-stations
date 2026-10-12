@@ -3,10 +3,10 @@ import type { FuelKey, HassEntity, SortMode, Station } from "./types";
 export const FUEL_KEYS = ["diesel", "gasoline95", "dieselprime", "gasolineprime", "gplauto"] as const;
 export const SORT_MODES = [...FUEL_KEYS, "distance"] as const;
 export const HISTORICAL_FUEL_PRICES: Record<FuelKey, number> = {
-  diesel: 1.583,
-  dieselprime: 1.623,
-  gasoline95: 1.684,
-  gasolineprime: 1.794,
+  diesel: 1.385,
+  dieselprime: 1.405,
+  gasoline95: 1.439,
+  gasolineprime: 1.454,
   gplauto: 0.818,
 };
 

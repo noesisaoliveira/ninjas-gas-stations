@@ -2,6 +2,10 @@
 
 Notable changes to Ninjas Gas Stations are documented here. Versions are listed newest first.
 
+## 0.1.14 - 2026-10-12
+
+- Updated the optional `BeforeTrumpWar` comparison baselines to the Plenergy Gaia II prices from 1 March 2026.
+
 ## 0.1.13 - 2026-10-12
 
 - Corrected `BeforeTrumpWar` sign: higher current fuel prices than the historical baseline now show a negative estimated difference.

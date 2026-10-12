@@ -81,14 +81,14 @@ describe("card logic", () => {
 
   it("compares each fuel with its fixed historical reference price", () => {
     expect(HISTORICAL_FUEL_PRICES).toEqual({
-      diesel: 1.583,
-      dieselprime: 1.623,
-      gasoline95: 1.684,
-      gasolineprime: 1.794,
+      diesel: 1.385,
+      dieselprime: 1.405,
+      gasoline95: 1.439,
+      gasolineprime: 1.454,
       gplauto: 0.818,
     });
-    expect(beforeTrumpWarDifference("diesel", 1.989, 30)).toBe(-12.18);
-    expect(beforeTrumpWarDifference("diesel", 1.5, 30)).toBe(2.49);
+    expect(beforeTrumpWarDifference("diesel", 1.791, 30)).toBe(-12.18);
+    expect(beforeTrumpWarDifference("diesel", 1.3, 30)).toBe(2.55);
     expect(beforeTrumpWarDifference("gplauto", 0.818, 30)).toBe(0);
   });
 });

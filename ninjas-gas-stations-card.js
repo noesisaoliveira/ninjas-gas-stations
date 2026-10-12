@@ -643,10 +643,10 @@ function tg(C) {
   return Ig.find(({ terms: g }) => g.some((I) => A.includes(I)));
 }
 const wA = ["diesel", "gasoline95", "dieselprime", "gasolineprime", "gplauto"], eg = [...wA, "distance"], sg = {
-  diesel: 1.583,
-  dieselprime: 1.623,
-  gasoline95: 1.684,
-  gasolineprime: 1.794,
+  diesel: 1.385,
+  dieselprime: 1.405,
+  gasoline95: 1.439,
+  gasolineprime: 1.454,
   gplauto: 0.818
 };
 function ig(C) {
