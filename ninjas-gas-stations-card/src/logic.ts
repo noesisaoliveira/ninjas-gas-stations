@@ -2,6 +2,13 @@ import type { FuelKey, HassEntity, SortMode, Station } from "./types";
 
 export const FUEL_KEYS = ["diesel", "gasoline95", "dieselprime", "gasolineprime", "gplauto"] as const;
 export const SORT_MODES = [...FUEL_KEYS, "distance"] as const;
+export const HISTORICAL_FUEL_PRICES: Record<FuelKey, number> = {
+  diesel: 1.583,
+  dieselprime: 1.623,
+  gasoline95: 1.684,
+  gasolineprime: 1.794,
+  gplauto: 0.818,
+};
 
 export function entityLocation(entity: HassEntity | undefined): { lat: number; lon: number } | undefined {
   if (!entity) return undefined;
@@ -41,6 +48,10 @@ export function fuelEstimate(price: number, prices: number[], liters: number): {
     total: roundCurrency(price * liters),
     difference: roundCurrency(Math.max(0, (price - cheapest) * liters)),
   };
+}
+
+export function beforeTrumpWarDifference(fuel: FuelKey, currentPrice: number, liters: number): number {
+  return Math.round((currentPrice - HISTORICAL_FUEL_PRICES[fuel]) * liters * 100) / 100;
 }
 
 export function fuelName(key: FuelKey, language?: string): string {

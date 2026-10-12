@@ -1,13 +1,14 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { brandMark } from "./brand-icons";
-import { displayedFuels, entityLocation, FUEL_KEYS, fuelEstimate, fuelName, priceLevel, relativeUpdatedAt, SORT_MODES, sortStations } from "./logic";
+import { beforeTrumpWarDifference, displayedFuels, entityLocation, FUEL_KEYS, fuelEstimate, fuelName, priceLevel, relativeUpdatedAt, SORT_MODES, sortStations } from "./logic";
 import type { CardConfig, FuelKey, HomeAssistant, SortMode, StationsResponse, Station } from "./types";
 
 const DEFAULT_CONFIG: Omit<CardConfig, "type" | "api_url"> = {
   radius_km: 15,
   limit: 5,
   estimate: 30,
+  trump: false,
   fuels: ["diesel", "gasoline95"],
   sort_by: "diesel",
   navigation_app: "waze",
@@ -232,7 +233,9 @@ export class NinjasGasStationsCard extends LitElement {
     if (!price) return nothing;
     const values = group.map((item) => item.prices[fuel]?.price_eur).filter((value): value is number => value !== undefined);
     const cheapest = values.length > 0 && price.price_eur === Math.min(...values);
-    const estimate = fuelEstimate(price.price_eur, values, this._config?.estimate ?? DEFAULT_CONFIG.estimate);
+    const liters = this._config?.estimate ?? DEFAULT_CONFIG.estimate;
+    const estimate = fuelEstimate(price.price_eur, values, liters);
+    const beforeTrumpWar = beforeTrumpWarDifference(fuel, price.price_eur, liters);
     const currency = (amount: number) => new Intl.NumberFormat(this._hass?.language ?? "pt-PT", {
       style: "currency",
       currency: "EUR",
@@ -241,8 +244,9 @@ export class NinjasGasStationsCard extends LitElement {
       ${price.price_eur.toFixed(3)} €/l<small>${fuelName(fuel, this._hass?.language)}</small>
       ${fuel === "gasolineprime" ? html`<small>${price.label}</small>` : nothing}
       <small>${relativeUpdatedAt(price.updated_at, this._hass?.language)}</small>
-      <small>${this._config?.estimate ?? DEFAULT_CONFIG.estimate} L total: ${currency(estimate.total)}</small>
+      <small>${liters} L total: ${currency(estimate.total)}</small>
       ${estimate.difference > 0 ? html`<small>Diff: +${currency(estimate.difference)}</small>` : nothing}
+      ${this._config?.trump ? html`<small>BeforeTrumpWar: ${beforeTrumpWar > 0 ? "+" : ""}${currency(beforeTrumpWar)}</small>` : nothing}
       ${cheapest ? html`<span class="cheapest">${this._hass?.language?.startsWith("pt") ? "Mais barato" : "Cheapest"}</span>` : nothing}
     </div>`;
   }

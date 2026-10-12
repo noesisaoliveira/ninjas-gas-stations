@@ -41,6 +41,7 @@ export interface CardConfig {
   radius_km: number;
   limit: number;
   estimate: number;
+  trump: boolean;
   fuels: FuelKey[];
   sort_by: SortMode;
   navigation_app: "waze" | "google" | "apple";

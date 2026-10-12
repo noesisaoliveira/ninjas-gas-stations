@@ -2,6 +2,11 @@
 
 Notable changes to Ninjas Gas Stations are documented here. Versions are listed newest first.
 
+## 0.1.12 - 2026-10-12
+
+- Added a `trump` card setting, disabled by default, to optionally show the estimated fill-cost difference from the fixed historical fuel prices.
+- Added fixed historical reference prices for diesel, premium diesel, gasoline 95, premium gasoline, and GPL Auto; the comparison uses the configured `estimate` litres.
+
 ## 0.1.11 - 2026-10-12
 
 - Added a configurable `estimate` litre amount to the Lovelace card, with per-station total cost and the difference from the cheapest visible station.

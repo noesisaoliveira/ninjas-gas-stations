@@ -262,10 +262,10 @@ p.elementStyles = [], p.shadowRootOptions = { mode: "open" }, p[M("elementProper
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const V = globalThis, IA = (C) => C, N = V.trustedTypes, tA = N ? N.createPolicy("lit-html", { createHTML: (C) => C }) : void 0, cA = "$lit$", f = `lit$${Math.random().toFixed(9).slice(2)}$`, PA = "?" + f, MA = `<${PA}>`, v = document, y = () => v.createComment(""), H = (C) => C === null || typeof C != "object" && typeof C != "function", S = Array.isArray, yA = (C) => S(C) || typeof C?.[Symbol.iterator] == "function", K = `[ 	
-\f\r]`, x = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, eA = /-->/g, sA = />/g, h = RegExp(`>|${K}(?:([^\\s"'>=/]+)(${K}*=${K}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), iA = /'/g, oA = /"/g, BA = /^(?:script|style|textarea|title)$/i, HA = (C) => (A, ...g) => ({ _$litType$: C, strings: A, values: g }), n = HA(1), m = Symbol.for("lit-noChange"), r = Symbol.for("lit-nothing"), rA = /* @__PURE__ */ new WeakMap(), E = v.createTreeWalker(v, 129);
-function lA(C, A) {
+const V = globalThis, IA = (C) => C, N = V.trustedTypes, tA = N ? N.createPolicy("lit-html", { createHTML: (C) => C }) : void 0, cA = "$lit$", D = `lit$${Math.random().toFixed(9).slice(2)}$`, PA = "?" + D, MA = `<${PA}>`, v = document, y = () => v.createComment(""), H = (C) => C === null || typeof C != "object" && typeof C != "function", S = Array.isArray, yA = (C) => S(C) || typeof C?.[Symbol.iterator] == "function", K = `[ 	
+\f\r]`, x = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, eA = /-->/g, sA = />/g, d = RegExp(`>|${K}(?:([^\\s"'>=/]+)(${K}*=${K}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), iA = /'/g, oA = /"/g, lA = /^(?:script|style|textarea|title)$/i, HA = (C) => (A, ...g) => ({ _$litType$: C, strings: A, values: g }), P = HA(1), m = Symbol.for("lit-noChange"), r = Symbol.for("lit-nothing"), rA = /* @__PURE__ */ new WeakMap(), E = v.createTreeWalker(v, 129);
+function BA(C, A) {
   if (!S(C) || !C.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return tA !== void 0 ? tA.createHTML(A) : A;
 }
@@ -274,31 +274,31 @@ const zA = (C, A) => {
   let t, e = A === 2 ? "<svg>" : A === 3 ? "<math>" : "", s = x;
   for (let o = 0; o < g; o++) {
     const i = C[o];
-    let c, P, a = -1, Q = 0;
-    for (; Q < i.length && (s.lastIndex = Q, P = s.exec(i), P !== null); ) Q = s.lastIndex, s === x ? P[1] === "!--" ? s = eA : P[1] !== void 0 ? s = sA : P[2] !== void 0 ? (BA.test(P[2]) && (t = RegExp("</" + P[2], "g")), s = h) : P[3] !== void 0 && (s = h) : s === h ? P[0] === ">" ? (s = t ?? x, a = -1) : P[1] === void 0 ? a = -2 : (a = s.lastIndex - P[2].length, c = P[1], s = P[3] === void 0 ? h : P[3] === '"' ? oA : iA) : s === oA || s === iA ? s = h : s === eA || s === sA ? s = x : (s = h, t = void 0);
-    const w = s === h && C[o + 1].startsWith("/>") ? " " : "";
-    e += s === x ? i + MA : a >= 0 ? (I.push(c), i.slice(0, a) + cA + i.slice(a) + f + w) : i + f + (a === -2 ? o : w);
+    let n, c, a = -1, Q = 0;
+    for (; Q < i.length && (s.lastIndex = Q, c = s.exec(i), c !== null); ) Q = s.lastIndex, s === x ? c[1] === "!--" ? s = eA : c[1] !== void 0 ? s = sA : c[2] !== void 0 ? (lA.test(c[2]) && (t = RegExp("</" + c[2], "g")), s = d) : c[3] !== void 0 && (s = d) : s === d ? c[0] === ">" ? (s = t ?? x, a = -1) : c[1] === void 0 ? a = -2 : (a = s.lastIndex - c[2].length, n = c[1], s = c[3] === void 0 ? d : c[3] === '"' ? oA : iA) : s === oA || s === iA ? s = d : s === eA || s === sA ? s = x : (s = d, t = void 0);
+    const w = s === d && C[o + 1].startsWith("/>") ? " " : "";
+    e += s === x ? i + MA : a >= 0 ? (I.push(n), i.slice(0, a) + cA + i.slice(a) + D + w) : i + D + (a === -2 ? o : w);
   }
-  return [lA(C, e + (C[g] || "<?>") + (A === 2 ? "</svg>" : A === 3 ? "</math>" : "")), I];
+  return [BA(C, e + (C[g] || "<?>") + (A === 2 ? "</svg>" : A === 3 ? "</math>" : "")), I];
 };
 class z {
   constructor({ strings: A, _$litType$: g }, I) {
     let t;
     this.parts = [];
     let e = 0, s = 0;
-    const o = A.length - 1, i = this.parts, [c, P] = zA(A, g);
-    if (this.el = z.createElement(c, I), E.currentNode = this.el.content, g === 2 || g === 3) {
+    const o = A.length - 1, i = this.parts, [n, c] = zA(A, g);
+    if (this.el = z.createElement(n, I), E.currentNode = this.el.content, g === 2 || g === 3) {
       const a = this.el.content.firstChild;
       a.replaceWith(...a.childNodes);
     }
     for (; (t = E.nextNode()) !== null && i.length < o; ) {
       if (t.nodeType === 1) {
         if (t.hasAttributes()) for (const a of t.getAttributeNames()) if (a.endsWith(cA)) {
-          const Q = P[s++], w = t.getAttribute(a).split(f), L = /([.?@])?(.*)/.exec(Q);
+          const Q = c[s++], w = t.getAttribute(a).split(D), L = /([.?@])?(.*)/.exec(Q);
           i.push({ type: 1, index: e, name: L[2], strings: w, ctor: L[1] === "." ? FA : L[1] === "?" ? LA : L[1] === "@" ? ZA : X }), t.removeAttribute(a);
-        } else a.startsWith(f) && (i.push({ type: 6, index: e }), t.removeAttribute(a));
-        if (BA.test(t.tagName)) {
-          const a = t.textContent.split(f), Q = a.length - 1;
+        } else a.startsWith(D) && (i.push({ type: 6, index: e }), t.removeAttribute(a));
+        if (lA.test(t.tagName)) {
+          const a = t.textContent.split(D), Q = a.length - 1;
           if (Q > 0) {
             t.textContent = N ? N.emptyScript : "";
             for (let w = 0; w < Q; w++) t.append(a[w], y()), E.nextNode(), i.push({ type: 2, index: ++e });
@@ -308,7 +308,7 @@ class z {
       } else if (t.nodeType === 8) if (t.data === PA) i.push({ type: 2, index: e });
       else {
         let a = -1;
-        for (; (a = t.data.indexOf(f, a + 1)) !== -1; ) i.push({ type: 7, index: e }), a += f.length - 1;
+        for (; (a = t.data.indexOf(D, a + 1)) !== -1; ) i.push({ type: 7, index: e }), a += D.length - 1;
       }
       e++;
     }
@@ -340,8 +340,8 @@ class jA {
     let e = E.nextNode(), s = 0, o = 0, i = I[0];
     for (; i !== void 0; ) {
       if (s === i.index) {
-        let c;
-        i.type === 2 ? c = new F(e, e.nextSibling, this, A) : i.type === 1 ? c = new i.ctor(e, i.name, i.strings, this, A) : i.type === 6 && (c = new OA(e, this, A)), this._$AV.push(c), i = I[++o];
+        let n;
+        i.type === 2 ? n = new F(e, e.nextSibling, this, A) : i.type === 1 ? n = new i.ctor(e, i.name, i.strings, this, A) : i.type === 6 && (n = new OA(e, this, A)), this._$AV.push(n), i = I[++o];
       }
       s !== i?.index && (e = E.nextNode(), s++);
     }
@@ -383,7 +383,7 @@ class F {
     this._$AH !== r && H(this._$AH) ? this._$AA.nextSibling.data = A : this.T(v.createTextNode(A)), this._$AH = A;
   }
   $(A) {
-    const { values: g, _$litType$: I } = A, t = typeof I == "number" ? this._$AC(A) : (I.el === void 0 && (I.el = z.createElement(lA(I.h, I.h[0]), this.options)), I);
+    const { values: g, _$litType$: I } = A, t = typeof I == "number" ? this._$AC(A) : (I.el === void 0 && (I.el = z.createElement(BA(I.h, I.h[0]), this.options)), I);
     if (this._$AH?._$AD === t) this._$AH.p(g);
     else {
       const e = new jA(t, this), s = e.u(this.options);
@@ -427,8 +427,8 @@ class X {
     if (e === void 0) A = b(this, A, g, 0), s = !H(A) || A !== this._$AH && A !== m, s && (this._$AH = A);
     else {
       const o = A;
-      let i, c;
-      for (A = e[0], i = 0; i < e.length - 1; i++) c = b(this, o[I + i], g, i), c === m && (c = this._$AH[i]), s ||= !H(c) || c !== this._$AH[i], c === r ? A = r : A !== r && (A += (c ?? "") + e[i + 1]), this._$AH[i] = c;
+      let i, n;
+      for (A = e[0], i = 0; i < e.length - 1; i++) n = b(this, o[I + i], g, i), n === m && (n = this._$AH[i]), s ||= !H(n) || n !== this._$AH[i], n === r ? A = r : A !== r && (A += (n ?? "") + e[i + 1]), this._$AH[i] = n;
     }
     s && !t && this.j(A);
   }
@@ -566,7 +566,7 @@ function Y(C) {
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-function d(C) {
+function f(C) {
   return Y({ ...C, state: !0, attribute: !1 });
 }
 var GA = Object.defineProperty, kA = Object.getOwnPropertyDescriptor, _ = (C, A, g, I) => {
@@ -584,6 +584,7 @@ let j = class extends u {
       { name: "radius_km", selector: { number: { min: 1, max: 500, step: 1, mode: "box", unit_of_measurement: "km" } } },
       { name: "limit", selector: { number: { min: 1, max: 20, step: 1, mode: "box" } } },
       { name: "estimate", selector: { number: { min: 1, max: 1e3, step: 1, mode: "box", unit_of_measurement: "L" } } },
+      { name: "trump", selector: { boolean: {} } },
       { name: "fuels", selector: { select: { multiple: !0, options: [{ value: "diesel", label: "Gasóleo simples" }, { value: "gasoline95", label: "Gasolina simples 95" }, { value: "dieselprime", label: "Gasóleo especial" }, { value: "gasolineprime", label: "Lowest: Gasolina 98 / especial 95 / especial 98" }, { value: "gplauto", label: "GPL Auto" }] } } },
       { name: "sort_by", selector: { select: { options: [{ value: "diesel", label: "Cheapest diesel" }, { value: "gasoline95", label: "Cheapest gasoline 95" }, { value: "dieselprime", label: "Cheapest premium diesel" }, { value: "gasolineprime", label: "Cheapest premium gasoline" }, { value: "gplauto", label: "Cheapest GPL Auto" }, { value: "distance", label: "Nearest" }] } } },
       { name: "navigation_app", selector: { select: { options: [{ value: "waze", label: "Waze" }, { value: "google", label: "Google Maps" }, { value: "apple", label: "Apple Maps" }] } } },
@@ -598,7 +599,7 @@ let j = class extends u {
     }));
   }
   render() {
-    return n`<ha-form .hass=${this.hass} .data=${this.config ?? {}} .schema=${this.schema}
+    return P`<ha-form .hass=${this.hass} .data=${this.config ?? {}} .schema=${this.schema}
       .computeLabel=${(C) => C.name.replaceAll("_", " ")}
       @value-changed=${this.changed}></ha-form>`;
   }
@@ -641,39 +642,48 @@ function tg(C) {
   const A = (C ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   return Ig.find(({ terms: g }) => g.some((I) => A.includes(I)));
 }
-const wA = ["diesel", "gasoline95", "dieselprime", "gasolineprime", "gplauto"], eg = [...wA, "distance"];
-function sg(C) {
+const wA = ["diesel", "gasoline95", "dieselprime", "gasolineprime", "gplauto"], eg = [...wA, "distance"], sg = {
+  diesel: 1.583,
+  dieselprime: 1.623,
+  gasoline95: 1.684,
+  gasolineprime: 1.794,
+  gplauto: 0.818
+};
+function ig(C) {
   if (!C) return;
   const A = Number(C.attributes.latitude), g = Number(C.attributes.longitude);
   if (!(!Number.isFinite(A) || !Number.isFinite(g) || Math.abs(A) > 90 || Math.abs(g) > 180))
     return { lat: A, lon: g };
 }
-function ig(C, A) {
+function og(C, A) {
   return [...C].sort((g, I) => {
     if (A === "distance") return g.distance_km - I.distance_km;
     const t = g.prices[A]?.price_eur ?? Number.POSITIVE_INFINITY, e = I.prices[A]?.price_eur ?? Number.POSITIVE_INFINITY;
     return t - e || g.distance_km - I.distance_km;
   });
 }
-function og(C, A) {
+function rg(C, A) {
   return A === "distance" ? [...C] : [A];
 }
-function rg(C, A) {
+function ag(C, A) {
   const g = [...A].sort((t, e) => t - e), I = g.indexOf(C);
   return I <= Math.floor((g.length - 1) / 3) ? "low" : I >= Math.ceil((g.length - 1) * 2 / 3) ? "high" : "mid";
 }
-function ag(C, A, g) {
+function ng(C, A, g) {
   const I = A.length > 0 ? Math.min(...A) : C, t = (e) => Math.round((e + Number.EPSILON) * 100) / 100;
   return {
     total: t(C * g),
     difference: t(Math.max(0, (C - I) * g))
   };
 }
-function ng(C, A) {
+function cg(C, A, g) {
+  return Math.round((A - sg[C]) * g * 100) / 100;
+}
+function Pg(C, A) {
   const g = A?.toLowerCase().startsWith("pt");
   return C === "diesel" ? g ? "Gasóleo simples" : "Diesel" : C === "gasoline95" ? g ? "Gasolina simples 95" : "Gasoline 95" : C === "dieselprime" ? g ? "Gasóleo especial" : "Premium diesel" : C === "gasolineprime" ? g ? "Gasolina premium" : "Premium gasoline" : "GPL Auto";
 }
-function cg(C, A) {
+function lg(C, A) {
   if (!C) return A?.startsWith("pt") ? "Data indisponível" : "Date unavailable";
   const g = Date.now() - new Date(C).getTime();
   if (!Number.isFinite(g)) return A?.startsWith("pt") ? "Data indisponível" : "Date unavailable";
@@ -683,22 +693,23 @@ function cg(C, A) {
   const t = Math.floor(I / 24);
   return A?.startsWith("pt") ? `Atualizado há ${t} d` : `Updated ${t} d ago`;
 }
-var Pg = Object.defineProperty, Bg = Object.getOwnPropertyDescriptor, l = (C, A, g, I) => {
-  for (var t = I > 1 ? void 0 : I ? Bg(A, g) : A, e = C.length - 1, s; e >= 0; e--)
+var Bg = Object.defineProperty, Qg = Object.getOwnPropertyDescriptor, B = (C, A, g, I) => {
+  for (var t = I > 1 ? void 0 : I ? Qg(A, g) : A, e = C.length - 1, s; e >= 0; e--)
     (s = C[e]) && (t = (I ? s(A, g, t) : s(t)) || t);
-  return I && t && Pg(A, g, t), t;
+  return I && t && Bg(A, g, t), t;
 };
-const D = {
+const h = {
   radius_km: 15,
   limit: 5,
   estimate: 30,
+  trump: !1,
   fuels: ["diesel", "gasoline95"],
   sort_by: "diesel",
   navigation_app: "waze",
   show_brand_logo: !0,
   title: "Ninjas Gas Stations"
 };
-let B = class extends u {
+let l = class extends u {
   constructor() {
     super(...arguments), this._stations = [], this._busy = !1, this._error = "", this._locationMissing = !1, this._stale = !1, this._sort = "diesel", this._lastRequest = 0, this.visibilityChanged = () => {
       document.visibilityState === "visible" && this.refresh();
@@ -713,11 +724,11 @@ let B = class extends u {
   }
   setConfig(C) {
     if (!C.api_url) throw new Error("Ninjas Gas Stations card requires api_url");
-    const A = C.fuels?.length ? C.fuels : [...D.fuels], g = C.sort_by ?? D.sort_by, I = g === "distance" || A.includes(g) ? g : A[0];
+    const A = C.fuels?.length ? C.fuels : [...h.fuels], g = C.sort_by ?? h.sort_by, I = g === "distance" || A.includes(g) ? g : A[0];
     this._config = {
-      ...D,
+      ...h,
       ...C,
-      estimate: Number.isFinite(C.estimate) && (C.estimate ?? 0) > 0 ? C.estimate : D.estimate,
+      estimate: Number.isFinite(C.estimate) && (C.estimate ?? 0) > 0 ? C.estimate : h.estimate,
       fuels: A,
       sort_by: I,
       type: "custom:ninjas-gas-stations-card",
@@ -740,7 +751,7 @@ let B = class extends u {
   }
   readEntityLocation() {
     const C = this._config?.entity;
-    return sg(C ? this._hass?.states[C] : void 0);
+    return ig(C ? this._hass?.states[C] : void 0);
   }
   distanceMeters(C, A) {
     const g = (s) => s * Math.PI / 180, I = g(A.lat - C.lat), t = g(A.lon - C.lon);
@@ -780,7 +791,7 @@ let B = class extends u {
         });
         if (!g.ok) throw new Error(`Fuel service returned ${g.status}`);
         const I = await g.json();
-        this._stations = ig(I.stations, this._sort), this._stale = I.stale, this._lastRequest = Date.now();
+        this._stations = og(I.stations, this._sort), this._stale = I.stale, this._lastRequest = Date.now();
       } catch (C) {
         this._error = C instanceof Error ? C.message : "Unable to load nearby stations";
       } finally {
@@ -815,28 +826,29 @@ let B = class extends u {
   renderPrice(C, A, g) {
     const I = C.prices[A];
     if (!I) return r;
-    const t = g.map((i) => i.prices[A]?.price_eur).filter((i) => i !== void 0), e = t.length > 0 && I.price_eur === Math.min(...t), s = ag(I.price_eur, t, this._config?.estimate ?? D.estimate), o = (i) => new Intl.NumberFormat(this._hass?.language ?? "pt-PT", {
+    const t = g.map((c) => c.prices[A]?.price_eur).filter((c) => c !== void 0), e = t.length > 0 && I.price_eur === Math.min(...t), s = this._config?.estimate ?? h.estimate, o = ng(I.price_eur, t, s), i = cg(A, I.price_eur, s), n = (c) => new Intl.NumberFormat(this._hass?.language ?? "pt-PT", {
       style: "currency",
       currency: "EUR"
-    }).format(i);
-    return n`<div class="price ${rg(I.price_eur, t)}">
-      ${I.price_eur.toFixed(3)} €/l<small>${ng(A, this._hass?.language)}</small>
-      ${A === "gasolineprime" ? n`<small>${I.label}</small>` : r}
-      <small>${cg(I.updated_at, this._hass?.language)}</small>
-      <small>${this._config?.estimate ?? D.estimate} L total: ${o(s.total)}</small>
-      ${s.difference > 0 ? n`<small>Diff: +${o(s.difference)}</small>` : r}
-      ${e ? n`<span class="cheapest">${this._hass?.language?.startsWith("pt") ? "Mais barato" : "Cheapest"}</span>` : r}
+    }).format(c);
+    return P`<div class="price ${ag(I.price_eur, t)}">
+      ${I.price_eur.toFixed(3)} €/l<small>${Pg(A, this._hass?.language)}</small>
+      ${A === "gasolineprime" ? P`<small>${I.label}</small>` : r}
+      <small>${lg(I.updated_at, this._hass?.language)}</small>
+      <small>${s} L total: ${n(o.total)}</small>
+      ${o.difference > 0 ? P`<small>Diff: +${n(o.difference)}</small>` : r}
+      ${this._config?.trump ? P`<small>BeforeTrumpWar: ${i > 0 ? "+" : ""}${n(i)}</small>` : r}
+      ${e ? P`<span class="cheapest">${this._hass?.language?.startsWith("pt") ? "Mais barato" : "Cheapest"}</span>` : r}
     </div>`;
   }
   renderBrand(C) {
     const A = tg(C.brand);
-    return n`<span class="brand" role="img" aria-label=${C.brand || C.name} title=${C.brand || C.name}>
-      ${A && "image" in A ? n`<img src=${A.image} alt="" />` : A && "icon" in A ? n`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill=${`#${A.icon.hex}`} d=${A.icon.path}></path></svg>` : n`<svg class="brand-fallback" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 22V3h10v19H5Zm2-2h6V5H7v15Zm9-12h1.5l2.5 2.5V17a2 2 0 0 1-4 0v-2h2v2a.5.5 0 0 0 1 0v-5.7L16 10V8ZM8 7h4v4H8V7Z"></path></svg>`}
+    return P`<span class="brand" role="img" aria-label=${C.brand || C.name} title=${C.brand || C.name}>
+      ${A && "image" in A ? P`<img src=${A.image} alt="" />` : A && "icon" in A ? P`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill=${`#${A.icon.hex}`} d=${A.icon.path}></path></svg>` : P`<svg class="brand-fallback" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 22V3h10v19H5Zm2-2h6V5H7v15Zm9-12h1.5l2.5 2.5V17a2 2 0 0 1-4 0v-2h2v2a.5.5 0 0 0 1 0v-5.7L16 10V8ZM8 7h4v4H8V7Z"></path></svg>`}
     </span>`;
   }
   renderStation(C, A) {
-    const g = og(this._config?.fuels ?? [...D.fuels], this._sort);
-    return n`<li class="row">
+    const g = rg(this._config?.fuels ?? [...h.fuels], this._sort);
+    return P`<li class="row">
       <span class="rank" aria-label=${`Rank ${A + 1}`}>${A + 1}</span>
       ${this._config?.show_brand_logo ? this.renderBrand(C) : r}
       <div class="details"><div class="name">${C.name}</div>
@@ -852,27 +864,27 @@ let B = class extends u {
   render() {
     if (!this._config) return r;
     const C = this._hass?.language?.toLowerCase().startsWith("pt") ?? !1;
-    return n`<ha-card>
+    return P`<ha-card>
       <header class="head"><div><h2>${this._config.title}</h2>
         <div class="subtitle">${this._config.radius_km} km · ${this._stations.length} ${C ? "postos" : "stations"}</div></div>
         <button class="refresh" aria-label=${C ? "Atualizar postos" : "Refresh stations"} title=${C ? "Atualizar" : "Refresh"} ?disabled=${this._busy} @click=${() => void this.refresh()}>↻</button>
       </header>
       <nav class="modes" aria-label=${C ? "Ordenar por" : "Sort by"}>
-        ${eg.map((A) => n`<button aria-pressed=${this._sort === A} @click=${() => this.setSort(A)}>${this.sortLabel(A, C)}</button>`)}
+        ${eg.map((A) => P`<button aria-pressed=${this._sort === A} @click=${() => this.setSort(A)}>${this.sortLabel(A, C)}</button>`)}
       </nav>
-      ${this._stale ? n`<div class="warning" role="status">${C ? "Preços em cache: atualização temporariamente indisponível." : "Cached prices: live refresh is temporarily unavailable."}</div>` : r}
-      ${this._busy && !this._stations.length ? n`<div class="notice" aria-label="Loading">${[1, 2, 3].map(() => n`<div class="skeleton"></div>`)}</div>` : r}
-      ${this._locationMissing ? n`<div class="notice" role="status">${C ? "Ative a localização no Companion ou permita o acesso à localização do navegador." : "Enable Companion location tracking or allow browser location access."}</div>` : r}
-      ${this._error ? n`<div class="notice error" role="alert">${this._error}<br><button @click=${() => void this.refresh()}>${C ? "Tentar novamente" : "Retry"}</button></div>` : r}
-      ${!this._busy && !this._error && !this._locationMissing && !this._stations.length ? n`<div class="notice">${C ? `Sem postos num raio de ${this._config.radius_km} km` : `No stations within ${this._config.radius_km} km`}</div>` : r}
-      ${this._stations.length ? n`<ol class="rows">${this._stations.map((A, g) => this.renderStation(A, g))}</ol>` : r}
+      ${this._stale ? P`<div class="warning" role="status">${C ? "Preços em cache: atualização temporariamente indisponível." : "Cached prices: live refresh is temporarily unavailable."}</div>` : r}
+      ${this._busy && !this._stations.length ? P`<div class="notice" aria-label="Loading">${[1, 2, 3].map(() => P`<div class="skeleton"></div>`)}</div>` : r}
+      ${this._locationMissing ? P`<div class="notice" role="status">${C ? "Ative a localização no Companion ou permita o acesso à localização do navegador." : "Enable Companion location tracking or allow browser location access."}</div>` : r}
+      ${this._error ? P`<div class="notice error" role="alert">${this._error}<br><button @click=${() => void this.refresh()}>${C ? "Tentar novamente" : "Retry"}</button></div>` : r}
+      ${!this._busy && !this._error && !this._locationMissing && !this._stations.length ? P`<div class="notice">${C ? `Sem postos num raio de ${this._config.radius_km} km` : `No stations within ${this._config.radius_km} km`}</div>` : r}
+      ${this._stations.length ? P`<ol class="rows">${this._stations.map((A, g) => this.renderStation(A, g))}</ol>` : r}
     </ha-card>`;
   }
   static getStubConfig() {
-    return { ...D, api_url: "http://homeassistant.local:8099" };
+    return { ...h, api_url: "http://homeassistant.local:8099" };
   }
 };
-B.styles = nA`
+l.styles = nA`
     :host { display:block; color:var(--primary-text-color); }
     ha-card { overflow:hidden; }
     .head { align-items:center; border-bottom:1px solid var(--divider-color); display:flex; gap:12px; justify-content:space-between; padding:16px; }
@@ -918,44 +930,44 @@ B.styles = nA`
       .nav { align-self:center; grid-column:4; grid-row:1 / span 2; }
     }
   `;
-l([
+B([
   Y({ attribute: !1 })
-], B.prototype, "hass", 1);
-l([
-  d()
-], B.prototype, "_hass", 2);
-l([
-  d()
-], B.prototype, "_config", 2);
-l([
-  d()
-], B.prototype, "_stations", 2);
-l([
-  d()
-], B.prototype, "_busy", 2);
-l([
-  d()
-], B.prototype, "_error", 2);
-l([
-  d()
-], B.prototype, "_locationMissing", 2);
-l([
-  d()
-], B.prototype, "_stale", 2);
-l([
-  d()
-], B.prototype, "_sort", 2);
-B = l([
+], l.prototype, "hass", 1);
+B([
+  f()
+], l.prototype, "_hass", 2);
+B([
+  f()
+], l.prototype, "_config", 2);
+B([
+  f()
+], l.prototype, "_stations", 2);
+B([
+  f()
+], l.prototype, "_busy", 2);
+B([
+  f()
+], l.prototype, "_error", 2);
+B([
+  f()
+], l.prototype, "_locationMissing", 2);
+B([
+  f()
+], l.prototype, "_stale", 2);
+B([
+  f()
+], l.prototype, "_sort", 2);
+l = B([
   QA("ninjas-gas-stations-card")
-], B);
-const lg = "ninjas-gas-stations-card", DA = window.customCards ?? [];
-DA.push({ type: lg, name: "Ninjas Gas Stations", description: "Nearby Portuguese fuel prices from DGEG" });
+], l);
+const wg = "ninjas-gas-stations-card", DA = window.customCards ?? [];
+DA.push({ type: wg, name: "Ninjas Gas Stations", description: "Nearby Portuguese fuel prices from DGEG" });
 window.customCards = DA;
 export {
-  B as NinjasGasStationsCard,
-  sg as entityLocation,
-  ng as fuelName,
-  rg as priceLevel,
-  cg as relativeUpdatedAt,
-  ig as sortStations
+  l as NinjasGasStationsCard,
+  ig as entityLocation,
+  Pg as fuelName,
+  ag as priceLevel,
+  lg as relativeUpdatedAt,
+  og as sortStations
 };

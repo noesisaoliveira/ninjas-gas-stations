@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { brandMark } from "./brand-icons";
-import { displayedFuels, entityLocation, fuelEstimate, FUEL_KEYS, priceLevel, SORT_MODES, sortStations } from "./logic";
+import { beforeTrumpWarDifference, displayedFuels, entityLocation, fuelEstimate, FUEL_KEYS, HISTORICAL_FUEL_PRICES, priceLevel, SORT_MODES, sortStations } from "./logic";
 import type { Station } from "./types";
 
 const station = (id: string, distance: number, diesel?: number): Station => ({
@@ -77,5 +77,18 @@ describe("card logic", () => {
   it("estimates total fuel cost and rounds the difference to cents", () => {
     expect(fuelEstimate(1.734, [1.7, 1.734], 30)).toEqual({ total: 52.02, difference: 1.02 });
     expect(fuelEstimate(1.7, [1.7, 1.734], 30)).toEqual({ total: 51, difference: 0 });
+  });
+
+  it("compares each fuel with its fixed historical reference price", () => {
+    expect(HISTORICAL_FUEL_PRICES).toEqual({
+      diesel: 1.583,
+      dieselprime: 1.623,
+      gasoline95: 1.684,
+      gasolineprime: 1.794,
+      gplauto: 0.818,
+    });
+    expect(beforeTrumpWarDifference("diesel", 2.25, 30)).toBe(20.01);
+    expect(beforeTrumpWarDifference("diesel", 1.5, 30)).toBe(-2.49);
+    expect(beforeTrumpWarDifference("gplauto", 0.818, 30)).toBe(0);
   });
 });
