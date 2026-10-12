@@ -2,6 +2,12 @@
 
 Notable changes to Ninjas Gas Stations are documented here. Versions are listed newest first.
 
+## 0.1.15 - 2026-10-12
+
+- Run HTTP ingress and HTTPS API listeners against one app lifecycle to avoid duplicate DGEG refreshes.
+- Keep station records for fuels that refreshed successfully when another fuel's DGEG pages fail; report the failed fuel and request details.
+- Clarified Android Companion location setup using each phone's `device_tracker` entity.
+
 ## 0.1.14 - 2026-10-12
 
 - Updated the optional `BeforeTrumpWar` comparison baselines to the Plenergy Gaia II prices from 1 March 2026.

@@ -41,7 +41,7 @@ Fuel-sorted tabs show only the selected fuel price. **Nearest** shows the prices
 
 `estimate` is the fill size in litres used for each estimated total (default `30`). Each station also shows the additional cost versus the cheapest visible station for that fuel. Set `trump: true` to show `BeforeTrumpWar`, the estimated fill-cost difference from fixed reference prices recorded at Plenergy Gaia II on 1 March 2026: diesel `1.385`, dieselprime `1.405`, gasoline95 `1.439`, gasolineprime `1.454`, and gplauto `0.818` €/L. A negative amount means today's estimated fill costs more than the reference. This is a user-provided static comparison, not live DGEG history; it is hidden by default.
 
-You do not need an `entity` setting when using the iPhone's location permission prompt; leave it out and the card asks the browser or Companion app for location. To use Home Assistant's location entity instead, optionally add `entity: person.your_name` or `entity: device_tracker.your_phone` and enable Companion location tracking. Waze is opened using its app URL scheme, with an HTTPS fallback; iOS/Android may show a system confirmation depending on Companion/browser version.
+For browser geolocation, leave `entity` out and allow the browser's location prompt (this works in the iPhone Companion app). On Android, the Companion app's location permission enables its location sensors but may not grant geolocation to the dashboard WebView. Set `entity: device_tracker.your_android_phone` to use that phone's Companion location, enable its Background Location sensor, and confirm the entity has numeric `latitude` and `longitude` attributes. Each phone has a separate tracker; a card with one fixed entity always uses that phone's location. Give each phone its own card configuration if each should search from its own location. Waze is opened using its app URL scheme, with an HTTPS fallback; iOS/Android may show a system confirmation depending on Companion/browser version.
 
 ## Configuration
 
@@ -49,6 +49,7 @@ You do not need an `entity` setting when using the iPhone's location permission 
 
 | Option | Default | Meaning |
 | --- | ---: | --- |
+| `entity` | none | Optional Home Assistant `person` or `device_tracker` location entity; useful when Companion WebView geolocation is unavailable |
 | `radius_km` | 15 | Search radius, in km |
 | `limit` | 5 | Maximum number of stations |
 | `estimate` | 30 | Litres used for the estimated fill total and `BeforeTrumpWar` comparison |

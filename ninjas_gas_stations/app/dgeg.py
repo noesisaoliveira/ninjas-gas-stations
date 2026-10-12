@@ -62,7 +62,9 @@ class DgegProvider:
                 last_error = exc
                 if attempt < 2:
                     await asyncio.sleep(0.5 * (2**attempt))
-        raise RuntimeError(f"DGEG request failed for {route}") from last_error
+        raise RuntimeError(
+            f"DGEG request failed for {route} with params {params}: {last_error}"
+        ) from last_error
 
     async def fetch_stations(self) -> list[Station]:
         fuel_response = await self._get_json("GetTiposCombustiveis")
@@ -77,27 +79,46 @@ class DgegProvider:
             raise RuntimeError(f"DGEG fuel types not found: {', '.join(sorted(missing))}")
 
         grouped: dict[str, Station] = {}
-        for fuel_id in ids_by_label.values():
-            for page in range(1, self.max_pages + 1):
-                payload = await self._get_json(
-                    "PesquisarPostos",
-                    {
-                        "idsTiposComb": fuel_id,
-                        "idMarca": "",
-                        "idTipoPosto": "",
-                        "idDistrito": "",
-                        "idsMunicipios": "",
-                        "qtdPorPagina": PAGE_SIZE,
-                        "pagina": page,
-                    },
+        fetched_labels: list[str] = []
+        failed_labels: list[str] = []
+        for label, fuel_id in ids_by_label.items():
+            try:
+                for page in range(1, self.max_pages + 1):
+                    payload = await self._get_json(
+                        "PesquisarPostos",
+                        {
+                            "idsTiposComb": fuel_id,
+                            "idMarca": "",
+                            "idTipoPosto": "",
+                            "idDistrito": "",
+                            "idsMunicipios": "",
+                            "qtdPorPagina": PAGE_SIZE,
+                            "pagina": page,
+                        },
+                    )
+                    records = payload.get("resultado") or []
+                    for record in records:
+                        self._merge_record(grouped, record, ids_by_label)
+                    if len(records) < PAGE_SIZE:
+                        break
+                    # A small inter-page pause avoids hammering the public service.
+                    await asyncio.sleep(0.15)
+            except RuntimeError as exc:
+                failed_labels.append(label)
+                logger.warning(
+                    "DGEG refresh failed for fuel %s; keeping records from other fuels: %s",
+                    label,
+                    exc,
                 )
-                records = payload.get("resultado") or []
-                for record in records:
-                    self._merge_record(grouped, record, ids_by_label)
-                if len(records) < PAGE_SIZE:
-                    break
-                # A small inter-page pause avoids hammering the public service.
-                await asyncio.sleep(0.15)
+                continue
+            fetched_labels.append(label)
+
+        if not fetched_labels:
+            raise RuntimeError("DGEG refresh failed for every requested fuel type")
+        if failed_labels:
+            logger.warning(
+                "DGEG refresh is incomplete; unavailable fuels: %s", ", ".join(failed_labels)
+            )
         return list(grouped.values())
 
     @staticmethod

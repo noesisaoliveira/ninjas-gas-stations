@@ -5,9 +5,12 @@ import json
 import logging
 import os
 import signal
-import sys
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
+
+import uvicorn
 
 OPTIONS_PATH = Path(os.getenv("OPTIONS_FILE", "/data/options.json"))
 SSL_DIR = Path("/ssl")
@@ -31,89 +34,96 @@ def _certificate_path(filename: str, option_name: str) -> Path:
     return path
 
 
-def server_commands(options: dict[str, Any]) -> list[list[str]]:
+def server_configs(options: dict[str, Any], application: Any) -> list[uvicorn.Config]:
     log_level = os.getenv("LOG_LEVEL", "INFO").lower()
-    commands = [
-        [
-            sys.executable,
-            "-m",
-            "uvicorn",
-            "app.main:app",
-            "--host",
-            "0.0.0.0",
-            "--port",
-            "8099",
-            "--log-level",
-            log_level,
-        ]
+    configs = [
+        uvicorn.Config(
+            application,
+            host="0.0.0.0",
+            port=8099,
+            log_level=log_level,
+            lifespan="on",
+        )
     ]
     if options.get("ssl", False):
         certfile = _certificate_path(str(options.get("certfile", "fullchain.pem")), "certfile")
         keyfile = _certificate_path(str(options.get("keyfile", "privkey.pem")), "keyfile")
-        commands.append(
-            [
-                sys.executable,
-                "-m",
-                "uvicorn",
-                "app.main:app",
-                "--host",
-                "0.0.0.0",
-                "--port",
-                "8443",
-                "--log-level",
-                log_level,
-                "--ssl-certfile",
-                str(certfile),
-                "--ssl-keyfile",
-                str(keyfile),
-            ]
+        configs.append(
+            uvicorn.Config(
+                application,
+                host="0.0.0.0",
+                port=8443,
+                log_level=log_level,
+                lifespan="off",
+                ssl_certfile=str(certfile),
+                ssl_keyfile=str(keyfile),
+            )
         )
-    return commands
+    return configs
 
 
-async def _stop_process(process: asyncio.subprocess.Process) -> None:
-    if process.returncode is not None:
-        return
-    process.terminate()
-    try:
-        await asyncio.wait_for(process.wait(), timeout=10)
-    except TimeoutError:
-        process.kill()
-        await process.wait()
+class _ServerWithoutSignalCapture(uvicorn.Server):
+    @contextmanager
+    def capture_signals(self) -> Iterator[None]:
+        yield
+
+
+async def _wait_until_started(server: uvicorn.Server, task: asyncio.Task[None]) -> None:
+    while not server.started:
+        if task.done():
+            await task
+            raise RuntimeError("HTTP ingress server exited before startup completed")
+        await asyncio.sleep(0.01)
 
 
 async def run() -> int:
     options = _options()
-    commands = server_commands(options)
-    processes: list[asyncio.subprocess.Process] = []
+    from app.main import app
+
+    servers = [_ServerWithoutSignalCapture(config) for config in server_configs(options, app)]
+    tasks: list[asyncio.Task[None]] = []
     stop_requested = asyncio.Event()
     loop = asyncio.get_running_loop()
     for handled_signal in (signal.SIGTERM, signal.SIGINT):
         loop.add_signal_handler(handled_signal, stop_requested.set)
 
     try:
-        for command in commands:
-            processes.append(await asyncio.create_subprocess_exec(*command))
+        http_task = asyncio.create_task(servers[0].serve())
+        tasks.append(http_task)
+        await _wait_until_started(servers[0], http_task)
+
+        if len(servers) == 2:
+            tls_task = asyncio.create_task(servers[1].serve())
+            tasks.append(tls_task)
+            await _wait_until_started(servers[1], tls_task)
+
         if options.get("ssl", False):
             logger.info("Serving Supervisor ingress on HTTP :8099 and direct API on HTTPS :8443")
         else:
             logger.info("Serving Supervisor ingress on HTTP :8099; direct TLS is disabled")
 
-        waiters = [asyncio.create_task(process.wait()) for process in processes]
         stop_waiter = asyncio.create_task(stop_requested.wait())
-        done, pending = await asyncio.wait(
-            [*waiters, stop_waiter], return_when=asyncio.FIRST_COMPLETED
-        )
-        for waiter in pending:
-            waiter.cancel()
+        done, _ = await asyncio.wait([*tasks, stop_waiter], return_when=asyncio.FIRST_COMPLETED)
         if stop_waiter in done:
+            for server in servers:
+                server.should_exit = True
+            await asyncio.gather(*tasks)
             return 0
 
-        exit_codes = [process.returncode or 0 for process in processes]
-        logger.error("A web server exited unexpectedly: %s", exit_codes)
-        return next((code for code in exit_codes if code not in (None, 0)), 1)
+        finished = next(task for task in tasks if task in done)
+        if finished.exception() is not None:
+            logger.error("A web server exited unexpectedly: %s", finished.exception())
+        else:
+            logger.error("A web server exited unexpectedly")
+        for server in servers:
+            server.should_exit = True
+        await asyncio.gather(*tasks, return_exceptions=True)
+        return 1
     finally:
-        await asyncio.gather(*(_stop_process(process) for process in processes))
+        for server in servers:
+            server.should_exit = True
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
 
 
 if __name__ == "__main__":
