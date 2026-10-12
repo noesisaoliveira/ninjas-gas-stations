@@ -2,6 +2,19 @@
 
 Notable changes to Ninjas Gas Stations are documented here. Versions are listed newest first.
 
+## 0.1.8 - 2026-10-12
+
+- Added `dieselprime` for Gasóleo especial.
+- Added `gasolineprime`, which uses each station's lowest available price among Gasolina 98, Gasolina especial 95, and Gasolina especial 98.
+- Added prime fuels to the card editor and sorting controls; the selected gasoline grade is shown with its price.
+- Existing cached station data is retained as fallback and refreshed immediately after updating to include the added fuels.
+
+## 0.1.7 - 2026-10-12
+
+- Added `dieselprime` for Gasóleo especial.
+- Added `gasolineprime`, which uses the lowest per-station price among Gasolina 98, Gasolina especial 95, and Gasolina especial 98.
+- Added the two fuel aliases to card configuration and sorting.
+
 ## 0.1.6 - 2026-10-11
 
 - Added step-by-step HACS custom repository installation instructions.

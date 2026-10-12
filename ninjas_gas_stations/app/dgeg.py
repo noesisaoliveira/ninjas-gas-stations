@@ -17,6 +17,18 @@ DGEG_API_ROOT = "https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb"
 FUEL_LABELS = {
     "diesel": "Gasóleo simples",
     "gasoline95": "Gasolina simples 95",
+    "dieselprime": "Gasóleo especial",
+    "gasolineprime": "Gasolina premium",
+}
+FUEL_LABEL_GROUPS = {
+    "diesel": ("Gasóleo simples",),
+    "gasoline95": ("Gasolina simples 95",),
+    "dieselprime": ("Gasóleo especial",),
+    "gasolineprime": (
+        "Gasolina 98",
+        "Gasolina especial 95",
+        "Gasolina especial 98",
+    ),
 }
 PAGE_SIZE = 50
 MAX_PAGES = 80
@@ -53,11 +65,12 @@ class DgegProvider:
     async def fetch_stations(self) -> list[Station]:
         fuel_response = await self._get_json("GetTiposCombustiveis")
         ids_by_label: dict[str, str] = {}
+        requested_labels = {label for labels in FUEL_LABEL_GROUPS.values() for label in labels}
         for item in fuel_response.get("resultado", []):
             label = str(item.get("Descritivo", "")).strip()
-            if item.get("fl_ativo") and label in FUEL_LABELS.values():
+            if item.get("fl_ativo") and label in requested_labels:
                 ids_by_label[label] = str(item["Id"])
-        missing = set(FUEL_LABELS.values()) - ids_by_label.keys()
+        missing = requested_labels - ids_by_label.keys()
         if missing:
             raise RuntimeError(f"DGEG fuel types not found: {', '.join(sorted(missing))}")
 

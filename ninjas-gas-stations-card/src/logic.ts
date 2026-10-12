@@ -30,7 +30,9 @@ export function priceLevel(price: number, prices: number[]): "low" | "mid" | "hi
 export function fuelName(key: FuelKey, language?: string): string {
   const portuguese = language?.toLowerCase().startsWith("pt");
   if (key === "diesel") return portuguese ? "Gasóleo simples" : "Diesel";
-  return portuguese ? "Gasolina simples 95" : "Gasoline 95";
+  if (key === "gasoline95") return portuguese ? "Gasolina simples 95" : "Gasoline 95";
+  if (key === "dieselprime") return portuguese ? "Gasóleo especial" : "Premium diesel";
+  return portuguese ? "Gasolina premium" : "Premium gasoline";
 }
 
 export function relativeUpdatedAt(value: string | null, language?: string): string {

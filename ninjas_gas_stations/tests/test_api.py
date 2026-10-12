@@ -18,7 +18,13 @@ def test_api_requires_token_for_direct_requests(tmp_path, monkeypatch) -> None:
                     municipality="Lisboa",
                     latitude=38.73,
                     longitude=-9.13,
-                    prices={"2101": FuelPrice("2101", "Gasóleo simples", 1.65, None)},
+                    prices={
+                        "2101": FuelPrice("2101", "Gasóleo simples", 1.65, None),
+                        "2105": FuelPrice("2105", "Gasóleo especial", 1.90, None),
+                        "3400": FuelPrice("3400", "Gasolina 98", 1.86, None),
+                        "3205": FuelPrice("3205", "Gasolina especial 95", 1.79, None),
+                        "3405": FuelPrice("3405", "Gasolina especial 98", 1.95, None),
+                    },
                 ),
                 Station(
                     id="cheapest",
@@ -28,7 +34,13 @@ def test_api_requires_token_for_direct_requests(tmp_path, monkeypatch) -> None:
                     municipality="Lisboa",
                     latitude=38.75,
                     longitude=-9.13,
-                    prices={"2101": FuelPrice("2101", "Gasóleo simples", 1.50, None)},
+                    prices={
+                        "2101": FuelPrice("2101", "Gasóleo simples", 1.50, None),
+                        "2105": FuelPrice("2105", "Gasóleo especial", 1.80, None),
+                        "3400": FuelPrice("3400", "Gasolina 98", 1.60, None),
+                        "3205": FuelPrice("3205", "Gasolina especial 95", 1.70, None),
+                        "3405": FuelPrice("3405", "Gasolina especial 98", 1.80, None),
+                    },
                 ),
                 Station(
                     id="outside",
@@ -68,11 +80,25 @@ def test_api_requires_token_for_direct_requests(tmp_path, monkeypatch) -> None:
             "/api/stations?lat=38.7223&lon=-9.1393&radius_km=15&sort=diesel",
             headers={"Authorization": b"Bearer p\xe4ss-token"},
         )
+        prime_stations = client.get(
+            "/api/stations?lat=38.7223&lon=-9.1393&radius_km=15&fuels=gasolineprime&sort=gasolineprime",
+            headers={"Authorization": b"Bearer p\xe4ss-token"},
+        )
+        diesel_prime_stations = client.get(
+            "/api/stations?lat=38.7223&lon=-9.1393&radius_km=15&fuels=dieselprime&sort=dieselprime",
+            headers={"Authorization": b"Bearer p\xe4ss-token"},
+        )
 
     assert response.status_code == 200
     assert response.json()["fuels"]["diesel"] == "Gasóleo simples"
     assert [station["id"] for station in stations.json()["stations"]] == ["cheapest", "closer"]
     assert stations.json()["stations"][0]["prices"]["diesel"]["price_eur"] == 1.50
+    assert [station["id"] for station in prime_stations.json()["stations"]] == [
+        "cheapest",
+        "closer",
+    ]
+    assert prime_stations.json()["stations"][0]["prices"]["gasolineprime"]["label"] == "Gasolina 98"
+    assert diesel_prime_stations.json()["stations"][0]["prices"]["dieselprime"]["price_eur"] == 1.80
 
     with TestClient(main.app, client=("172.30.32.2", 50_000)) as ingress_client:
         ingress = ingress_client.get(

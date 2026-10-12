@@ -33,13 +33,22 @@ class JsonCache:
     def is_fresh(self) -> bool:
         return self._value is not None and time.time() - self._stored_at < self.ttl_seconds
 
+    def expire(self) -> None:
+        if self._value is None:
+            return
+        self._stored_at = 0.0
+        self._write()
+
     def set(self, value: Any) -> None:
         self._value = value
         self._stored_at = time.time()
+        self._write()
+
+    def _write(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         temporary_path = self.path.with_suffix(".tmp")
         temporary_path.write_text(
-            json.dumps({"stored_at": self._stored_at, "value": value}, ensure_ascii=False),
+            json.dumps({"stored_at": self._stored_at, "value": self._value}, ensure_ascii=False),
             encoding="utf-8",
         )
         temporary_path.replace(self.path)

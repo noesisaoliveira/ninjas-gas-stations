@@ -49,6 +49,32 @@ def test_dgeg_rows_are_grouped_by_station_and_fuel() -> None:
     assert "navigate=yes" in serialized["waze_url"]
 
 
+def test_gasolineprime_uses_cheapest_special_grade_per_station() -> None:
+    station = Station(
+        id="prime",
+        name="Premium Station",
+        brand=None,
+        address=None,
+        municipality=None,
+        latitude=38,
+        longitude=-9,
+        prices={
+            "3400": FuelPrice("3400", "Gasolina 98", 1.89, None),
+            "3205": FuelPrice("3205", "Gasolina especial 95", 1.79, None),
+            "3405": FuelPrice("3405", "Gasolina especial 98", 1.95, None),
+        },
+    )
+
+    serialized = _serialize_station(station, 2.0)
+
+    assert serialized["prices"]["gasolineprime"] == {
+        "label": "Gasolina especial 95",
+        "price_eur": 1.79,
+        "updated_at": None,
+    }
+    assert _station_sort_key(station, "gasolineprime", 2.0) == (1.79, 2.0)
+
+
 def test_recorded_dgeg_fixture_matches_live_response_shape() -> None:
     fixture = Path(__file__).parent / "fixtures" / "dgeg_search.json"
     payload = json.loads(fixture.read_text(encoding="utf-8"))

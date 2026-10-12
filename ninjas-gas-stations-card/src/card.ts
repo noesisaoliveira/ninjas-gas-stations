@@ -47,6 +47,8 @@ export class NinjasGasStationsCard extends LitElement {
     .refresh { font-size:1.25rem; }
     .modes { display:flex; gap:4px; padding:10px 12px 2px; }
     .modes button { flex:1; font-size:.76rem; min-height:40px; padding:6px; }
+      .modes { display:flex; flex-wrap:wrap; gap:4px; padding:10px 12px 2px; }
+      .modes button { flex:1 1 calc(33.333% - 4px); font-size:.76rem; min-height:40px; padding:6px; }
     .modes [aria-pressed="true"] { background:var(--primary-color); color:var(--text-primary-color, #fff); }
     .rows { list-style:none; margin:0; padding:0 12px 8px; }
     .row { align-items:center; border-bottom:1px solid var(--divider-color); display:grid; gap:10px; grid-template-columns:30px 38px minmax(0,1fr) auto 44px; min-height:92px; padding:10px 4px; }
@@ -171,6 +173,17 @@ export class NinjasGasStationsCard extends LitElement {
     void this.refresh();
   }
 
+  private sortLabel(mode: SortMode, portuguese: boolean): string {
+    const labels: Record<SortMode, [string, string]> = {
+      diesel: ["Gasóleo", "Diesel"],
+      gasoline95: ["Gasolina 95", "Gasoline 95"],
+      dieselprime: ["Gasóleo esp.", "Premium diesel"],
+      gasolineprime: ["Gasolina prém.", "Premium gas"],
+      distance: ["Distância", "Nearest"],
+    };
+    return labels[mode][portuguese ? 0 : 1];
+  }
+
   private openNavigation(station: Station) {
     const app = this._config?.navigation_app ?? "waze";
     const url = app === "google" ? station.google_maps_url : app === "apple" ? station.apple_maps_url : station.waze_url;
@@ -193,6 +206,7 @@ export class NinjasGasStationsCard extends LitElement {
     const cheapest = values.length > 0 && price.price_eur === Math.min(...values);
     return html`<div class="price ${priceLevel(price.price_eur, values)}">
       ${price.price_eur.toFixed(3)} €/l<small>${fuelName(fuel, this._hass?.language)}</small>
+      ${fuel === "gasolineprime" ? html`<small>${price.label}</small>` : nothing}
       <small>${relativeUpdatedAt(price.updated_at, this._hass?.language)}</small>
       ${cheapest ? html`<span class="cheapest">${this._hass?.language?.startsWith("pt") ? "Mais barato" : "Cheapest"}</span>` : nothing}
     </div>`;
@@ -224,7 +238,7 @@ export class NinjasGasStationsCard extends LitElement {
         <button class="refresh" aria-label=${pt ? "Atualizar postos" : "Refresh stations"} title=${pt ? "Atualizar" : "Refresh"} ?disabled=${this._busy} @click=${() => void this.refresh()}>↻</button>
       </header>
       <nav class="modes" aria-label=${pt ? "Ordenar por" : "Sort by"}>
-        ${(["diesel", "gasoline95", "distance"] as const).map((mode) => html`<button aria-pressed=${this._sort === mode} @click=${() => this.setSort(mode)}>${mode === "diesel" ? (pt ? "Gasóleo" : "Diesel") : mode === "gasoline95" ? "95" : (pt ? "Distância" : "Nearest")}</button>`)}
+        ${(["diesel", "gasoline95", "dieselprime", "gasolineprime", "distance"] as const).map((mode) => html`<button aria-pressed=${this._sort === mode} @click=${() => this.setSort(mode)}>${this.sortLabel(mode, pt)}</button>`)}
       </nav>
       ${this._stale ? html`<div class="warning" role="status">${pt ? "Preços em cache: atualização temporariamente indisponível." : "Cached prices: live refresh is temporarily unavailable."}</div>` : nothing}
       ${this._busy && !this._stations.length ? html`<div class="notice" aria-label="Loading">${[1, 2, 3].map(() => html`<div class="skeleton"></div>`)}</div>` : nothing}

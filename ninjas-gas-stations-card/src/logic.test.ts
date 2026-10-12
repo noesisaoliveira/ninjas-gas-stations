@@ -19,6 +19,26 @@ describe("card logic", () => {
     expect(sortStations([station("far", 8), station("near", 1)], "distance").map((item) => item.id)).toEqual(["near", "far"]);
   });
 
+  it("sorts premium gasoline by the cheapest selected grade", () => {
+    const expensive = station("expensive", 2);
+    expensive.prices.gasolineprime = {
+      label: "Gasolina 98",
+      price_eur: 1.9,
+      updated_at: null,
+    };
+    const cheapest = station("cheapest", 3);
+    cheapest.prices.gasolineprime = {
+      label: "Gasolina especial 95",
+      price_eur: 1.75,
+      updated_at: null,
+    };
+
+    expect(sortStations([expensive, cheapest], "gasolineprime").map((item) => item.id)).toEqual([
+      "cheapest",
+      "expensive",
+    ]);
+  });
+
   it("assigns relative price levels", () => {
     expect(priceLevel(1, [1, 2, 3])).toBe("low");
     expect(priceLevel(3, [1, 2, 3])).toBe("high");

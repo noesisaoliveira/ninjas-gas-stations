@@ -29,6 +29,8 @@ limit: 5
 fuels:
   - diesel
   - gasoline95
+  - dieselprime
+  - gasolineprime
 sort_by: diesel
 navigation_app: waze
 show_brand_logo: true
@@ -50,7 +52,7 @@ You do not need an `entity` setting when using the iPhone's location permission 
 | `trusted_ingress_cidrs` | `172.30.32.2/32` | Supervisor ingress proxy IP, configurable for custom HA networks |
 | `log_level` | `INFO` | Add-on log level |
 
-`GET /api/stations` accepts `lat`, `lon`, `radius_km`, `limit`, `fuels`, and `sort` (`diesel`, `gasoline95`, or `distance`). `/api/health` reports index status, and `/api/meta` lists provider and fuel aliases. All API routes require the Bearer token unless reached through authenticated Supervisor ingress.
+`GET /api/stations` accepts `lat`, `lon`, `radius_km`, `limit`, `fuels`, and `sort`. Fuel aliases are `diesel`, `gasoline95`, `dieselprime`, and `gasolineprime`; the latter returns each station's lowest price among Gasolina 98, Gasolina especial 95, and Gasolina especial 98. Sort accepts any fuel alias or `distance`. `/api/health` reports index status, and `/api/meta` lists provider and fuel aliases. All API routes require the Bearer token unless reached through authenticated Supervisor ingress.
 
 ## Local Development
 

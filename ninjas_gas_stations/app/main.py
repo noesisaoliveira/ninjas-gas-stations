@@ -20,7 +20,7 @@ from starlette.middleware.base import RequestResponseEndpoint
 from starlette.responses import Response
 
 from app.cache import JsonCache
-from app.dgeg import FUEL_LABELS, DgegProvider
+from app.dgeg import FUEL_LABEL_GROUPS, FUEL_LABELS, DgegProvider
 from app.geo import haversine_km, within_radius_bbox
 from app.models import FuelPrice, Station
 
@@ -45,6 +45,7 @@ logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
 for log_handler in logging.getLogger().handlers:
     log_handler.setFormatter(JsonLogFormatter())
 logger = logging.getLogger("ninjas_gas_stations")
+PRIME_FUEL_LABELS = set(FUEL_LABEL_GROUPS["dieselprime"]) | set(FUEL_LABEL_GROUPS["gasolineprime"])
 
 
 def _load_options() -> dict[str, Any]:
@@ -56,16 +57,17 @@ def _load_options() -> dict[str, Any]:
 
 
 def _serialize_station(station: Station, distance_km: float) -> dict[str, Any]:
-    prices = {
-        fuel_key: {
+    prices: dict[str, dict[str, Any]] = {}
+    for fuel_key, labels in FUEL_LABEL_GROUPS.items():
+        matching_prices = [price for price in station.prices.values() if price.label in labels]
+        if not matching_prices:
+            continue
+        price = min(matching_prices, key=lambda item: item.price_eur)
+        prices[fuel_key] = {
             "label": price.label,
             "price_eur": price.price_eur,
             "updated_at": price.updated_at.isoformat() if price.updated_at else None,
         }
-        for key, price in station.prices.items()
-        for fuel_key, label in FUEL_LABELS.items()
-        if label == price.label
-    }
     return {
         "id": station.id,
         "name": station.name,
@@ -130,11 +132,11 @@ def _station_to_json(station: Station) -> dict[str, Any]:
 def _station_sort_key(station: Station, sort: str, distance: float) -> tuple[float, float]:
     if sort == "distance":
         return (distance, 0)
-    fuel_key = "gasoline95" if sort == "gasoline95" else "diesel"
-    fuel_label = FUEL_LABELS[fuel_key]
-    price = next(
-        (p.price_eur for p in station.prices.values() if p.label == fuel_label), float("inf")
-    )
+    fuel_labels = FUEL_LABEL_GROUPS[sort]
+    available_prices = [
+        price.price_eur for price in station.prices.values() if price.label in fuel_labels
+    ]
+    price = min(available_prices, default=float("inf"))
     return (price, distance)
 
 
@@ -145,10 +147,19 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     provider = DgegProvider()
     cache = JsonCache(DATA_DIR / "stations.json", ttl_seconds)
     cached = cache.get()
+    stations = [_station_from_json(item) for item in cached] if cached else []
+    last_refresh = datetime.fromtimestamp(cache._stored_at, UTC) if cached else None
+    if cached and not any(
+        price.label in PRIME_FUEL_LABELS
+        for station in stations
+        for price in station.prices.values()
+    ):
+        cache.expire()
+        logger.info("Legacy station cache found; scheduling refresh for the additional fuel types")
     app.state.provider = provider
     app.state.cache = cache
-    app.state.stations = [_station_from_json(item) for item in cached] if cached else []
-    app.state.last_refresh = datetime.fromtimestamp(cache._stored_at, UTC) if cached else None
+    app.state.stations = stations
+    app.state.last_refresh = last_refresh
     app.state.refresh_lock = asyncio.Lock()
     app.state.options = options
 
@@ -175,7 +186,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await provider.close()
 
 
-app = FastAPI(title="Ninjas Gas Stations", version="0.1.6", lifespan=lifespan)
+app = FastAPI(title="Ninjas Gas Stations", version="0.1.8", lifespan=lifespan)
 _request_times: dict[str, list[float]] = {}
 
 
@@ -284,7 +295,9 @@ async def get_stations(
     radius_km: float | None = Query(default=None, gt=0, le=500),
     limit: int | None = Query(default=None, ge=1, le=50),
     fuels: str | None = None,
-    sort: str = Query(default="diesel", pattern="^(diesel|gasoline95|distance)$"),
+    sort: str = Query(
+        default="diesel", pattern="^(diesel|gasoline95|dieselprime|gasolineprime|distance)$"
+    ),
 ) -> JSONResponse:
     await _refresh(request)
     options = request.app.state.options
@@ -307,8 +320,9 @@ async def get_stations(
         if exclude and any(value in brand for value in exclude):
             continue
         present_fuels = {
-            "diesel" if p.label == FUEL_LABELS["diesel"] else "gasoline95"
-            for p in station.prices.values()
+            fuel
+            for fuel, labels in FUEL_LABEL_GROUPS.items()
+            if any(price.label in labels for price in station.prices.values())
         }
         if requested and not requested.intersection(present_fuels):
             continue

@@ -12,6 +12,14 @@ async def test_provider_resolves_fuel_ids_and_reads_mocked_station_pages() -> No
     fixture_path = Path(__file__).parent / "fixtures" / "dgeg_search.json"
     fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
     calls: list[httpx.Request] = []
+    fuels = {
+        "2101": "Gasóleo simples",
+        "3201": "Gasolina simples 95",
+        "2105": "Gasóleo especial",
+        "3400": "Gasolina 98",
+        "3205": "Gasolina especial 95",
+        "3405": "Gasolina especial 98",
+    }
 
     def handler(request: httpx.Request) -> httpx.Response:
         calls.append(request)
@@ -21,13 +29,17 @@ async def test_provider_resolves_fuel_ids_and_reads_mocked_station_pages() -> No
                 json={
                     "status": True,
                     "resultado": [
-                        {"Id": 2101, "Descritivo": "Gasóleo simples", "fl_ativo": True},
-                        {"Id": 3201, "Descritivo": "Gasolina simples 95", "fl_ativo": True},
+                        {
+                            "Id": int(fuel_id),
+                            "Descritivo": label,
+                            "fl_ativo": True,
+                        }
+                        for fuel_id, label in fuels.items()
                     ],
                 },
             )
         fuel_id = request.url.params["idsTiposComb"]
-        label = "Gasóleo simples" if fuel_id == "2101" else "Gasolina simples 95"
+        label = fuels[fuel_id]
         rows = [row for row in fixture["resultado"] if row["Combustivel"] == label]
         return httpx.Response(200, json={"status": True, "resultado": rows})
 
@@ -39,7 +51,7 @@ async def test_provider_resolves_fuel_ids_and_reads_mocked_station_pages() -> No
     finally:
         await provider.close()
 
-    assert len(calls) == 3
+    assert len(calls) == len(fuels) + 1
     assert len(stations) == 1
     assert stations[0].prices["2101"].price_eur == 1.939
     assert stations[0].prices["3201"].price_eur == 1.999
