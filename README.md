@@ -4,8 +4,6 @@ Home Assistant add-on and Lovelace card for comparing nearby Portuguese fuel pri
 
 Validated for Home Assistant Core 2025.11+, Supervisor 2025.11+, and Home Assistant OS 16.x. Supported architectures are `amd64`, `aarch64`, and `armv7` (including Raspberry Pi 3). Each architecture has its own GHCR image tag. The CI uses the Home Assistant 2025.09 builder because 2025.11 dropped armv7 build support.
 
-Screenshots for light and dark themes will be added after Companion-app validation.
-
 ## Install
 
 1. Add `https://github.com/noesisaoliveira/ninjas-gas-stations` to **Settings → Add-ons → Add-on store → ⋮ → Repositories**.
@@ -26,6 +24,8 @@ api_url: https://ha.example.com:9443
 api_token: !secret ninjas_gas_api_token
 radius_km: 15
 limit: 5
+estimate: 30
+trump: false
 fuels:
   - diesel
   - gasoline95
@@ -39,9 +39,26 @@ show_brand_logo: true
 
 Fuel-sorted tabs show only the selected fuel price. **Nearest** shows the prices for all fuels configured on the card. Recognized brands use bundled logos when available; generic or unsupported brands show a fuel-pump symbol instead of initials.
 
+`estimate` is the fill size in litres used for each estimated total (default `30`). Each station also shows the additional cost versus the cheapest visible station for that fuel. Set `trump: true` to show `BeforeTrumpWar`, the estimated fill-cost difference from fixed reference prices recorded at Plenergy Gaia II on 1 March 2026: diesel `1.385`, dieselprime `1.405`, gasoline95 `1.439`, gasolineprime `1.454`, and gplauto `0.818` €/L. A negative amount means today's estimated fill costs more than the reference. This is a user-provided static comparison, not live DGEG history; it is hidden by default.
+
 You do not need an `entity` setting when using the iPhone's location permission prompt; leave it out and the card asks the browser or Companion app for location. To use Home Assistant's location entity instead, optionally add `entity: person.your_name` or `entity: device_tracker.your_phone` and enable Companion location tracking. Waze is opened using its app URL scheme, with an HTTPS fallback; iOS/Android may show a system confirmation depending on Companion/browser version.
 
 ## Configuration
+
+### Card options
+
+| Option | Default | Meaning |
+| --- | ---: | --- |
+| `radius_km` | 15 | Search radius, in km |
+| `limit` | 5 | Maximum number of stations |
+| `estimate` | 30 | Litres used for the estimated fill total and `BeforeTrumpWar` comparison |
+| `trump` | `false` | Show the optional historical price comparison |
+| `fuels` | diesel, gasoline95 | Fuel prices shown in **Nearest** mode |
+| `sort_by` | diesel | Initial price sort; use `distance` for **Nearest** |
+| `navigation_app` | `waze` | Navigation target: `waze`, `google`, or `apple` |
+| `show_brand_logo` | `true` | Show bundled brand logos where available |
+
+### Add-on options
 
 | Option | Default | Meaning |
 | --- | ---: | --- |
@@ -51,11 +68,14 @@ You do not need an `entity` setting when using the iPhone's location permission 
 | `brands_include` | `[]` | Optional case-insensitive brand allowlist |
 | `brands_exclude` | `[]` | Optional case-insensitive brand denylist |
 | `api_token` | empty | Required Bearer token for direct API access |
+| `ssl` | `false` | Enable native HTTPS API on container port `8443` |
+| `certfile` | `fullchain.pem` | TLS certificate filename under `/ssl` |
+| `keyfile` | `privkey.pem` | TLS private key filename under `/ssl` |
 | `allowed_origins` | empty | Comma-separated exact browser origins |
 | `trusted_ingress_cidrs` | `172.30.32.2/32` | Supervisor ingress proxy IP, configurable for custom HA networks |
 | `log_level` | `INFO` | Add-on log level |
 
-`GET /api/stations` accepts `lat`, `lon`, `radius_km`, `limit`, `fuels`, and `sort`. Fuel aliases are `diesel`, `gasoline95`, `dieselprime`, `gasolineprime`, and `gplauto`; `gasolineprime` returns each station's lowest price among Gasolina 98, Gasolina especial 95, and Gasolina especial 98. `gplauto` returns GPL Auto in €/l. Sort accepts any fuel alias or `distance`. `/api/health` reports index status, and `/api/meta` lists provider and fuel aliases. All API routes require the Bearer token unless reached through authenticated Supervisor ingress.
+`GET /api/stations` accepts `lat`, `lon`, `radius_km`, `limit`, `fuels`, and `sort`. Fuel aliases are `diesel`, `gasoline95`, `dieselprime`, `gasolineprime`, and `gplauto`; `gasolineprime` returns each station's lowest price among Gasolina 98, Gasolina especial 95, and Gasolina especial 98. `gplauto` returns GPL Auto in €/l. Sort accepts any fuel alias or `distance`. `/api/health` reports index status, and `/api/meta` lists provider and fuel aliases. All API routes require the Bearer token unless reached through authenticated Supervisor ingress. Direct HTTPS is available on `8443` when `ssl` is enabled; Supervisor ingress remains HTTP on `8099`.
 
 ## Local Development
 
@@ -103,4 +123,4 @@ Then add the generated HACS resource and paste the card YAML above into a dashbo
 
 ## Roadmap
 
-Fuel type extensibility is built into the provider. Future additions: favorites, detour-adjusted real cost, MQTT/HA sensors, price trend arrows, and expanded fuels such as Gasolina 98, GPL, and Gasóleo colorido.
+Future enhancements may include favorites, detour-adjusted real cost, MQTT/Home Assistant sensors, and price trend indicators.
