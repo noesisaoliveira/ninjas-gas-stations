@@ -41,7 +41,7 @@ Fuel-sorted tabs show only the selected fuel price. **Nearest** shows the prices
 
 `estimate` is the fill size in litres used for each estimated total (default `30`). Each station also shows the additional cost versus the cheapest visible station for that fuel. Set `trump: true` to show `BeforeTrumpWar`, the estimated fill-cost difference from fixed reference prices recorded at Plenergy Gaia II on 1 March 2026: diesel `1.385`, dieselprime `1.405`, gasoline95 `1.439`, gasolineprime `1.454`, and gplauto `0.818` €/L. A negative amount means today's estimated fill costs more than the reference. This is a user-provided static comparison, not live DGEG history; it is hidden by default.
 
-For browser geolocation, leave `entity` out and allow the browser's location prompt (this works in the iPhone Companion app). On Android, the Companion app's location permission enables its location sensors but may not grant geolocation to the dashboard WebView. Set `entity: device_tracker.your_android_phone` to use that phone's Companion location, enable its Background Location sensor, and confirm the entity has numeric `latitude` and `longitude` attributes. Each phone has a separate tracker; a card with one fixed entity always uses that phone's location. Give each phone its own card configuration if each should search from its own location. Waze is opened using its app URL scheme, with an HTTPS fallback; iOS/Android may show a system confirmation depending on Companion/browser version.
+When `entity` is omitted, the card uses browser geolocation and keeps the browser permission prompt. For a card shared among Home Assistant users, set `use_current_user_person: true` as well: the card matches the logged-in user to a `person` entity by its `user_id` and uses that person's latest coordinates. If no matching person has valid coordinates, browser geolocation remains the fallback. Each user needs to be linked to a person entity with a location source. A configured `entity` takes precedence; use a fixed `device_tracker` when you want one particular phone's location. Waze is opened using its app URL scheme, with an HTTPS fallback; iOS/Android may show a system confirmation depending on Companion/browser version.
 
 ## Configuration
 
@@ -50,6 +50,7 @@ For browser geolocation, leave `entity` out and allow the browser's location pro
 | Option | Default | Meaning |
 | --- | ---: | --- |
 | `entity` | none | Optional Home Assistant `person` or `device_tracker` location entity; useful when Companion WebView geolocation is unavailable |
+| `use_current_user_person` | `false` | Match the logged-in HA user to their `person` entity when no fixed `entity` is set |
 | `radius_km` | 15 | Search radius, in km |
 | `limit` | 5 | Maximum number of stations |
 | `estimate` | 30 | Litres used for the estimated fill total and `BeforeTrumpWar` comparison |

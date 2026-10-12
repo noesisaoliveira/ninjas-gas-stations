@@ -2,6 +2,11 @@
 
 Notable changes to Ninjas Gas Stations are documented here. Versions are listed newest first.
 
+## 0.1.16 - 2026-10-12
+
+- Preserve last-known prices for fuels whose DGEG refresh fails, while preferring newly fetched prices.
+- Add optional current-user `person` location lookup for shared dashboards; browser geolocation remains the default and fallback.
+
 ## 0.1.15 - 2026-10-12
 
 - Run HTTP ingress and HTTPS API listeners against one app lifecycle to avoid duplicate DGEG refreshes.

@@ -8,7 +8,7 @@ from app.models import FuelPrice, Station
 
 def test_api_requires_token_for_direct_requests(tmp_path, monkeypatch) -> None:
     class MockProvider:
-        async def fetch_stations(self):
+        async def fetch_stations(self, fallback_stations=None):
             return [
                 Station(
                     id="closer",

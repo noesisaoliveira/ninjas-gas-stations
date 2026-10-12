@@ -1,12 +1,13 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { brandMark } from "./brand-icons";
-import { beforeTrumpWarDifference, displayedFuels, entityLocation, FUEL_KEYS, fuelEstimate, fuelName, priceLevel, relativeUpdatedAt, SORT_MODES, sortStations } from "./logic";
+import { beforeTrumpWarDifference, currentUserPersonLocation, displayedFuels, entityLocation, FUEL_KEYS, fuelEstimate, fuelName, priceLevel, relativeUpdatedAt, SORT_MODES, sortStations } from "./logic";
 import type { CardConfig, FuelKey, HomeAssistant, SortMode, StationsResponse, Station } from "./types";
 
 const DEFAULT_CONFIG: Omit<CardConfig, "type" | "api_url"> = {
   radius_km: 15,
   limit: 5,
+  use_current_user_person: false,
   estimate: 30,
   trump: false,
   fuels: ["diesel", "gasoline95"],
@@ -128,7 +129,7 @@ export class NinjasGasStationsCard extends LitElement {
   };
 
   private async refreshIfLocationChanged() {
-    const location = this.readEntityLocation();
+    const location = this.readConfiguredLocation();
     if (!location) return;
     const moved = !this._location || this.distanceMeters(this._location, location) > 300;
     this._location = location;
@@ -143,6 +144,12 @@ export class NinjasGasStationsCard extends LitElement {
     return entityLocation(entityId ? this._hass?.states[entityId] : undefined);
   }
 
+  private readConfiguredLocation() {
+    if (this._config?.entity) return this.readEntityLocation();
+    if (this._config?.use_current_user_person) return currentUserPersonLocation(this._hass);
+    return undefined;
+  }
+
   private distanceMeters(a: { lat: number; lon: number }, b: { lat: number; lon: number }) {
     const toRad = (value: number) => value * Math.PI / 180;
     const dLat = toRad(b.lat - a.lat);
@@ -152,8 +159,8 @@ export class NinjasGasStationsCard extends LitElement {
   }
 
   private async getLocation() {
-    const fromEntity = this.readEntityLocation();
-    if (fromEntity) return fromEntity;
+    const configuredLocation = this.readConfiguredLocation();
+    if (configuredLocation) return configuredLocation;
     if (!navigator.geolocation) return undefined;
     return new Promise<{ lat: number; lon: number } | undefined>((resolve) => {
       navigator.geolocation.getCurrentPosition(

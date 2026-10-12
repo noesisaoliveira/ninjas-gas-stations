@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { brandMark } from "./brand-icons";
-import { beforeTrumpWarDifference, displayedFuels, entityLocation, fuelEstimate, FUEL_KEYS, HISTORICAL_FUEL_PRICES, priceLevel, SORT_MODES, sortStations } from "./logic";
+import { beforeTrumpWarDifference, currentUserPersonLocation, displayedFuels, entityLocation, fuelEstimate, FUEL_KEYS, HISTORICAL_FUEL_PRICES, priceLevel, SORT_MODES, sortStations } from "./logic";
 import type { Station } from "./types";
 
 const station = (id: string, distance: number, diesel?: number): Station => ({
@@ -18,6 +18,20 @@ describe("card logic", () => {
   it("accepts coordinates only when both entity attributes are valid", () => {
     expect(entityLocation({ state: "home", attributes: { latitude: 38.7, longitude: -9.1 } })).toEqual({ lat: 38.7, lon: -9.1 });
     expect(entityLocation({ state: "unknown", attributes: { latitude: "unknown", longitude: 0 } })).toBeUndefined();
+  });
+
+  it("uses the person linked to the logged-in Home Assistant user", () => {
+    const hass = {
+      user: { id: "user-1" },
+      states: {
+        "person.alice": { state: "home", attributes: { user_id: "user-1", latitude: 38.7, longitude: -9.1 } },
+        "person.bob": { state: "home", attributes: { user_id: "user-2", latitude: 40, longitude: -8 } },
+        "device_tracker.other": { state: "home", attributes: { user_id: "user-1", latitude: 41, longitude: -7 } },
+      },
+    };
+
+    expect(currentUserPersonLocation(hass)).toEqual({ lat: 38.7, lon: -9.1 });
+    expect(currentUserPersonLocation({ ...hass, user: { id: "unlinked-user" } })).toBeUndefined();
   });
 
   it("uses bundled logos for known brands and no initials for unknown brands", () => {

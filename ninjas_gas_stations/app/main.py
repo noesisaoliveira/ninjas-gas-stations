@@ -176,7 +176,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 try:
                     async with app.state.refresh_lock:
                         if not cache.is_fresh():
-                            stations = await provider.fetch_stations()
+                            stations = await provider.fetch_stations(app.state.stations)
                             cache.set([_station_to_json(station) for station in stations])
                             app.state.stations = stations
                             app.state.last_refresh = datetime.now(UTC)
@@ -193,7 +193,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await provider.close()
 
 
-app = FastAPI(title="Ninjas Gas Stations", version="0.1.15", lifespan=lifespan)
+app = FastAPI(title="Ninjas Gas Stations", version="0.1.16", lifespan=lifespan)
 _request_times: dict[str, list[float]] = {}
 
 
@@ -261,7 +261,7 @@ async def _refresh(request: Request, force: bool = False) -> None:
         if not force and cache.is_fresh():
             return
         try:
-            stations = await request.app.state.provider.fetch_stations()
+            stations = await request.app.state.provider.fetch_stations(request.app.state.stations)
         except Exception as exc:
             logger.warning("DGEG refresh failed; retaining cached data: %s", exc)
             if request.app.state.stations:

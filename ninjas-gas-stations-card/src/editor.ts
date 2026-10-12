@@ -15,6 +15,7 @@ export class NinjasGasStationsCardEditor extends LitElement {
     return [
       { name: "title", selector: { text: {} } },
       { name: "entity", selector: { entity: { filter: [{ domain: ["device_tracker", "person"] }] } } },
+      { name: "use_current_user_person", selector: { boolean: {} } },
       { name: "api_url", selector: { text: { type: "url" } } },
       { name: "api_token", selector: { text: { type: "password" } } },
       { name: "radius_km", selector: { number: { min: 1, max: 500, step: 1, mode: "box", unit_of_measurement: "km" } } },
@@ -39,7 +40,9 @@ export class NinjasGasStationsCardEditor extends LitElement {
 
   render() {
     return html`<ha-form .hass=${this.hass} .data=${this.config ?? {}} .schema=${this.schema}
-      .computeLabel=${(schema: { name: string }) => schema.name.replaceAll("_", " ")}
+      .computeLabel=${(schema: { name: string }) => schema.name === "use_current_user_person"
+        ? "Use logged-in user's person location"
+        : schema.name.replaceAll("_", " ")}
       @value-changed=${this.changed}></ha-form>`;
   }
 }

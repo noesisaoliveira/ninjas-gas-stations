@@ -8,6 +8,7 @@ export interface HassEntity {
 
 export interface HomeAssistant {
   states: Record<string, HassEntity>;
+  user?: { id: string };
   language?: string;
 }
 
@@ -36,6 +37,7 @@ export interface Station {
 export interface CardConfig {
   type: string;
   entity?: string;
+  use_current_user_person: boolean;
   api_url: string;
   api_token?: string;
   radius_km: number;

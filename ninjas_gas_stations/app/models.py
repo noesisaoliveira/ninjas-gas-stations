@@ -27,4 +27,6 @@ class Station:
 
 
 class FuelPriceProvider(Protocol):
-    async def fetch_stations(self) -> list[Station]: ...
+    async def fetch_stations(
+        self, fallback_stations: list[Station] | None = None
+    ) -> list[Station]: ...

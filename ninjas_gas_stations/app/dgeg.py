@@ -66,7 +66,7 @@ class DgegProvider:
             f"DGEG request failed for {route} with params {params}: {last_error}"
         ) from last_error
 
-    async def fetch_stations(self) -> list[Station]:
+    async def fetch_stations(self, fallback_stations: list[Station] | None = None) -> list[Station]:
         fuel_response = await self._get_json("GetTiposCombustiveis")
         ids_by_label: dict[str, str] = {}
         requested_labels = {label for labels in FUEL_LABEL_GROUPS.values() for label in labels}
@@ -106,7 +106,7 @@ class DgegProvider:
             except RuntimeError as exc:
                 failed_labels.append(label)
                 logger.warning(
-                    "DGEG refresh failed for fuel %s; keeping records from other fuels: %s",
+                    "DGEG refresh failed for fuel %s; retaining cached prices where available: %s",
                     label,
                     exc,
                 )
@@ -119,7 +119,42 @@ class DgegProvider:
             logger.warning(
                 "DGEG refresh is incomplete; unavailable fuels: %s", ", ".join(failed_labels)
             )
+            self._merge_fallback_prices(
+                grouped,
+                fallback_stations or [],
+                {ids_by_label[label] for label in failed_labels},
+            )
         return list(grouped.values())
+
+    @staticmethod
+    def _merge_fallback_prices(
+        grouped: dict[str, Station],
+        fallback_stations: list[Station],
+        failed_fuel_ids: set[str],
+    ) -> None:
+        for fallback in fallback_stations:
+            stale_prices = {
+                fuel_id: price
+                for fuel_id, price in fallback.prices.items()
+                if fuel_id in failed_fuel_ids
+            }
+            if not stale_prices:
+                continue
+            station = grouped.get(fallback.id)
+            if station is None:
+                station = Station(
+                    id=fallback.id,
+                    name=fallback.name,
+                    brand=fallback.brand,
+                    address=fallback.address,
+                    municipality=fallback.municipality,
+                    latitude=fallback.latitude,
+                    longitude=fallback.longitude,
+                    opening_hours=fallback.opening_hours,
+                )
+                grouped[fallback.id] = station
+            for fuel_id, price in stale_prices.items():
+                station.prices.setdefault(fuel_id, price)
 
     @staticmethod
     def _merge_record(

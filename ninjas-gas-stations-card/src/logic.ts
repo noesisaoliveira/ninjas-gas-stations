@@ -1,4 +1,4 @@
-import type { FuelKey, HassEntity, SortMode, Station } from "./types";
+import type { FuelKey, HassEntity, HomeAssistant, SortMode, Station } from "./types";
 
 export const FUEL_KEYS = ["diesel", "gasoline95", "dieselprime", "gasolineprime", "gplauto"] as const;
 export const SORT_MODES = [...FUEL_KEYS, "distance"] as const;
@@ -18,6 +18,15 @@ export function entityLocation(entity: HassEntity | undefined): { lat: number; l
     return undefined;
   }
   return { lat, lon };
+}
+
+export function currentUserPersonLocation(hass: HomeAssistant | undefined): { lat: number; lon: number } | undefined {
+  const userId = hass?.user?.id;
+  if (!userId || !hass) return undefined;
+  const person = Object.entries(hass.states).find(
+    ([entityId, entity]) => entityId.startsWith("person.") && entity.attributes.user_id === userId,
+  )?.[1];
+  return entityLocation(person);
 }
 
 export function sortStations(stations: Station[], mode: SortMode): Station[] {

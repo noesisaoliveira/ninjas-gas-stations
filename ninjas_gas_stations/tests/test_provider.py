@@ -5,6 +5,7 @@ import httpx
 import pytest
 
 from app.dgeg import DgegProvider
+from app.models import FuelPrice, Station
 
 
 @pytest.mark.asyncio
@@ -94,11 +95,37 @@ async def test_provider_keeps_successful_fuels_when_one_fuel_request_fails() -> 
     provider = DgegProvider(api_root="https://dgeg.test", max_pages=1)
     await provider.close()
     provider._client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    fallback_stations = [
+        Station(
+            id="67360",
+            name="Cached station",
+            brand=None,
+            address=None,
+            municipality=None,
+            latitude=38.72,
+            longitude=-9.13,
+            prices={
+                "2101": FuelPrice("2101", "Gasóleo simples", 0.5, None),
+                "2105": FuelPrice("2105", "Gasóleo especial", 1.81, None),
+            },
+        ),
+        Station(
+            id="old-only",
+            name="Cached-only station",
+            brand=None,
+            address=None,
+            municipality=None,
+            latitude=38.73,
+            longitude=-9.14,
+            prices={"2105": FuelPrice("2105", "Gasóleo especial", 1.82, None)},
+        ),
+    ]
     try:
-        stations = await provider.fetch_stations()
+        stations = await provider.fetch_stations(fallback_stations)
     finally:
         await provider.close()
 
-    assert len(stations) == 1
-    assert stations[0].prices["2101"].price_eur == 1.939
-    assert "2105" not in stations[0].prices
+    stations_by_id = {station.id: station for station in stations}
+    assert stations_by_id["67360"].prices["2101"].price_eur == 1.939
+    assert stations_by_id["67360"].prices["2105"].price_eur == 1.81
+    assert stations_by_id["old-only"].prices["2105"].price_eur == 1.82
