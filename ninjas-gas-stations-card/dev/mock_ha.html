@@ -26,18 +26,29 @@
           ["103", "Repsol Campo Grande", "Repsol", 1.579, 1.719, 3.2],
           ["104", "BP Amoreiras", "BP", 1.609, 1.739, 4.0],
           ["105", "Intermarché Benfica", "Intermarché", 1.549, 1.709, 4.8],
-        ].map(([id, name, brand, diesel, gasoline95, distance]) => ({
-          id, name, brand, municipality: "Lisboa", address: "Lisboa",
-          lat: 38.7223, lon: -9.1393, distance_km: distance,
-          prices: {
-            diesel: { label: "Gasóleo simples", price_eur: diesel, updated_at: new Date(now - 2_700_000).toISOString() },
-            gasoline95: { label: "Gasolina simples 95", price_eur: gasoline95, updated_at: new Date(now - 5_400_000).toISOString() },
-          },
-          opening_hours: null,
-          waze_url: "https://waze.com/ul?ll=38.7223,-9.1393&navigate=yes",
-          google_maps_url: "https://www.google.com/maps/dir/?api=1&destination=38.7223,-9.1393",
-          apple_maps_url: "https://maps.apple.com/?daddr=38.7223,-9.1393",
-        }));
+        ].map(([id, name, brand, diesel, gasoline95, distance], index) => {
+          const premiumGrades = [
+            { label: "Gasolina 98", price_eur: gasoline95 + 0.12 },
+            { label: "Gasolina especial 95", price_eur: gasoline95 + (index % 2 ? 0.05 : 0.02) },
+            { label: "Gasolina especial 98", price_eur: gasoline95 + 0.18 },
+          ];
+          const gasolinePrime = premiumGrades.reduce((cheapest, price) => price.price_eur < cheapest.price_eur ? price : cheapest);
+          return {
+            id, name, brand, municipality: "Lisboa", address: "Lisboa",
+            lat: 38.7223, lon: -9.1393, distance_km: distance,
+            prices: {
+              diesel: { label: "Gasóleo simples", price_eur: diesel, updated_at: new Date(now - 2_700_000).toISOString() },
+              gasoline95: { label: "Gasolina simples 95", price_eur: gasoline95, updated_at: new Date(now - 5_400_000).toISOString() },
+              dieselprime: { label: "Gasóleo especial", price_eur: diesel + 0.08, updated_at: new Date(now - 3_600_000).toISOString() },
+              gasolineprime: { ...gasolinePrime, updated_at: new Date(now - 5_400_000).toISOString() },
+              gplauto: { label: "GPL Auto", price_eur: 0.929 + index * 0.015, updated_at: new Date(now - 4_200_000).toISOString() },
+            },
+            opening_hours: null,
+            waze_url: "https://waze.com/ul?ll=38.7223,-9.1393&navigate=yes",
+            google_maps_url: "https://www.google.com/maps/dir/?api=1&destination=38.7223,-9.1393",
+            apple_maps_url: "https://maps.apple.com/?daddr=38.7223,-9.1393",
+          };
+        });
         const nativeFetch = window.fetch.bind(window);
         window.fetch = async (input, init) => {
           if (String(input).includes("/api/stations?")) {
@@ -62,7 +73,7 @@
         api_token: "local-dev-token",
         radius_km: 15,
         limit: 5,
-        fuels: ["diesel", "gasoline95"],
+        fuels: ["diesel", "gasoline95", "dieselprime", "gasolineprime", "gplauto"],
         sort_by: "diesel",
         navigation_app: "waze",
         show_brand_logo: true,

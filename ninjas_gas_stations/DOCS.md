@@ -36,12 +36,17 @@ fuels:
   - gasoline95
   - dieselprime
   - gasolineprime
+  - gplauto
 sort_by: diesel
 navigation_app: waze
 show_brand_logo: true
 ```
 
+When sorted by a fuel, the card shows only that fuel's price to keep station rows compact. Select **Nearest** to show prices for all fuels configured above.
+
 You do not need an `entity` setting when using the iPhone's location permission prompt; leave `entity` out and the card gets the phone's location from the browser or Home Assistant Companion app. To use Home Assistant's location entity instead, optionally add `entity: device_tracker.your_phone` or `entity: person.your_name`. Replace the API URL with the certificate-covered hostname and external router port (for example, `https://ha.example.com:9443`). The API URL port is the router's external port, not the add-on's internal port `8443`. Set `allowed_origins` to the exact Home Assistant dashboard origin, including its own port if nonstandard; it may differ from the API URL origin. Do not put a long-lived token in a dashboard shared with untrusted users.
+
+Station logos are shown for recognized brands when an included brand mark is available. Unrecognized brands (including generic/unbranded stations) use a fuel-pump symbol instead of brand initials.
 
 If you use an entity, enable Companion location tracking and confirm that the entity has numeric `latitude` and `longitude` attributes. When no entity is configured, the card uses browser/Companion geolocation directly.
 
@@ -68,7 +73,7 @@ The add-on always listens on HTTP port `8099` internally for authenticated Super
 
 - `GET /api/health`: station index status and last refresh time.
 - `GET /api/meta`: provider and supported fuel aliases.
-- `GET /api/stations?lat=<latitude>&lon=<longitude>&radius_km=15&limit=5&fuels=diesel,gasoline95&sort=diesel`: nearby station search. Fuel aliases are `diesel`, `gasoline95`, `dieselprime`, and `gasolineprime`. `gasolineprime` selects the lowest available price per station among Gasolina 98, Gasolina especial 95, and Gasolina especial 98. Sort can use any fuel alias or `distance`.
+- `GET /api/stations?lat=<latitude>&lon=<longitude>&radius_km=15&limit=5&fuels=diesel,gasoline95,gplauto&sort=diesel`: nearby station search. Fuel aliases are `diesel`, `gasoline95`, `dieselprime`, `gasolineprime`, and `gplauto`. `gasolineprime` selects the lowest available price per station among Gasolina 98, Gasolina especial 95, and Gasolina especial 98. `gplauto` returns GPL Auto in €/l. Sort can use any fuel alias or `distance`.
 
 Direct requests require `Authorization: Bearer <api_token>`. Requests through Supervisor ingress are accepted only from the configured trusted ingress address. The DGEG service has no published service-level agreement; prices can be stale during an outage. Fuel IDs are resolved from their live Portuguese labels.
 

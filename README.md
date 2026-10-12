@@ -31,10 +31,13 @@ fuels:
   - gasoline95
   - dieselprime
   - gasolineprime
+  - gplauto
 sort_by: diesel
 navigation_app: waze
 show_brand_logo: true
 ```
+
+Fuel-sorted tabs show only the selected fuel price. **Nearest** shows the prices for all fuels configured on the card. Recognized brands use bundled logos when available; generic or unsupported brands show a fuel-pump symbol instead of initials.
 
 You do not need an `entity` setting when using the iPhone's location permission prompt; leave it out and the card asks the browser or Companion app for location. To use Home Assistant's location entity instead, optionally add `entity: person.your_name` or `entity: device_tracker.your_phone` and enable Companion location tracking. Waze is opened using its app URL scheme, with an HTTPS fallback; iOS/Android may show a system confirmation depending on Companion/browser version.
 
@@ -52,7 +55,7 @@ You do not need an `entity` setting when using the iPhone's location permission 
 | `trusted_ingress_cidrs` | `172.30.32.2/32` | Supervisor ingress proxy IP, configurable for custom HA networks |
 | `log_level` | `INFO` | Add-on log level |
 
-`GET /api/stations` accepts `lat`, `lon`, `radius_km`, `limit`, `fuels`, and `sort`. Fuel aliases are `diesel`, `gasoline95`, `dieselprime`, and `gasolineprime`; the latter returns each station's lowest price among Gasolina 98, Gasolina especial 95, and Gasolina especial 98. Sort accepts any fuel alias or `distance`. `/api/health` reports index status, and `/api/meta` lists provider and fuel aliases. All API routes require the Bearer token unless reached through authenticated Supervisor ingress.
+`GET /api/stations` accepts `lat`, `lon`, `radius_km`, `limit`, `fuels`, and `sort`. Fuel aliases are `diesel`, `gasoline95`, `dieselprime`, `gasolineprime`, and `gplauto`; `gasolineprime` returns each station's lowest price among Gasolina 98, Gasolina especial 95, and Gasolina especial 98. `gplauto` returns GPL Auto in €/l. Sort accepts any fuel alias or `distance`. `/api/health` reports index status, and `/api/meta` lists provider and fuel aliases. All API routes require the Bearer token unless reached through authenticated Supervisor ingress.
 
 ## Local Development
 

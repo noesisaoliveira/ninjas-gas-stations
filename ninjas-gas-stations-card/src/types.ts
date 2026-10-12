@@ -1,4 +1,4 @@
-export type FuelKey = "diesel" | "gasoline95" | "dieselprime" | "gasolineprime";
+export type FuelKey = "diesel" | "gasoline95" | "dieselprime" | "gasolineprime" | "gplauto";
 export type SortMode = FuelKey | "distance";
 
 export interface HassEntity {

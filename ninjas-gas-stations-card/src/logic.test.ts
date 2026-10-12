@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { entityLocation, priceLevel, sortStations } from "./logic";
+import { brandMark } from "./brand-icons";
+import { displayedFuels, entityLocation, FUEL_KEYS, priceLevel, SORT_MODES, sortStations } from "./logic";
 import type { Station } from "./types";
 
 const station = (id: string, distance: number, diesel?: number): Station => ({
@@ -9,9 +10,21 @@ const station = (id: string, distance: number, diesel?: number): Station => ({
 });
 
 describe("card logic", () => {
+  it("exposes all fuel tabs plus nearest", () => {
+    expect(FUEL_KEYS).toEqual(["diesel", "gasoline95", "dieselprime", "gasolineprime", "gplauto"]);
+    expect(SORT_MODES).toEqual([...FUEL_KEYS, "distance"]);
+  });
+
   it("accepts coordinates only when both entity attributes are valid", () => {
     expect(entityLocation({ state: "home", attributes: { latitude: 38.7, longitude: -9.1 } })).toEqual({ lat: 38.7, lon: -9.1 });
     expect(entityLocation({ state: "unknown", attributes: { latitude: "unknown", longitude: 0 } })).toBeUndefined();
+  });
+
+  it("uses bundled logos for known brands and no initials for unknown brands", () => {
+    expect(brandMark("INTERMARCHÉ")).toBeDefined();
+    expect(brandMark("E.Leclerc")).toBeDefined();
+    expect(brandMark("Galp")).toBeUndefined();
+    expect(brandMark("Genérico")).toBeUndefined();
   });
 
   it("sorts by selected fuel or distance with stable tie breaks", () => {
@@ -37,6 +50,14 @@ describe("card logic", () => {
       "cheapest",
       "expensive",
     ]);
+  });
+
+  it("shows only the active fuel in price modes and all configured fuels in nearest mode", () => {
+    const configured = ["diesel", "gasoline95", "dieselprime", "gasolineprime", "gplauto"] as const;
+    expect(displayedFuels([...configured], "diesel")).toEqual(["diesel"]);
+    expect(displayedFuels([...configured], "gasoline95")).toEqual(["gasoline95"]);
+    expect(displayedFuels([...configured], "gplauto")).toEqual(["gplauto"]);
+    expect(displayedFuels([...configured], "distance")).toEqual([...configured]);
   });
 
   it("assigns relative price levels", () => {

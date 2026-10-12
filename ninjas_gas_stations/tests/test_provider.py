@@ -19,6 +19,7 @@ async def test_provider_resolves_fuel_ids_and_reads_mocked_station_pages() -> No
         "3400": "Gasolina 98",
         "3205": "Gasolina especial 95",
         "3405": "Gasolina especial 98",
+        "1120": "GPL Auto",
     }
 
     def handler(request: httpx.Request) -> httpx.Response:

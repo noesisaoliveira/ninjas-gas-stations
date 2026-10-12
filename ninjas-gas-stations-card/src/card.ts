@@ -1,6 +1,7 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { entityLocation, fuelName, priceLevel, relativeUpdatedAt, sortStations } from "./logic";
+import { brandMark } from "./brand-icons";
+import { displayedFuels, entityLocation, FUEL_KEYS, fuelName, priceLevel, relativeUpdatedAt, SORT_MODES, sortStations } from "./logic";
 import type { CardConfig, FuelKey, HomeAssistant, SortMode, StationsResponse, Station } from "./types";
 
 const DEFAULT_CONFIG: Omit<CardConfig, "type" | "api_url"> = {
@@ -40,43 +41,65 @@ export class NinjasGasStationsCard extends LitElement {
     :host { display:block; color:var(--primary-text-color); }
     ha-card { overflow:hidden; }
     .head { align-items:center; border-bottom:1px solid var(--divider-color); display:flex; gap:12px; justify-content:space-between; padding:16px; }
-    h2 { font-size:1.05rem; font-weight:650; margin:0; }
+    h2 { font-size:1.08rem; font-weight:700; margin:0; }
     .subtitle { color:var(--secondary-text-color); font-size:.82rem; margin-top:4px; }
     button { align-items:center; background:var(--secondary-background-color); border:0; border-radius:8px; color:var(--primary-text-color); cursor:pointer; display:inline-flex; justify-content:center; min-height:44px; min-width:44px; padding:8px 12px; }
     button:focus-visible { outline:2px solid var(--primary-color); outline-offset:2px; }
     .refresh { font-size:1.25rem; }
-    .modes { display:flex; gap:4px; padding:10px 12px 2px; }
-    .modes button { flex:1; font-size:.76rem; min-height:40px; padding:6px; }
-      .modes { display:flex; flex-wrap:wrap; gap:4px; padding:10px 12px 2px; }
-      .modes button { flex:1 1 calc(33.333% - 4px); font-size:.76rem; min-height:40px; padding:6px; }
+    .modes { display:grid; gap:5px; grid-template-columns:repeat(auto-fit,minmax(86px,1fr)); padding:12px 14px 8px; }
+    .modes button { background:transparent; border:1px solid var(--divider-color); font-size:.75rem; min-height:40px; padding:6px 8px; }
     .modes [aria-pressed="true"] { background:var(--primary-color); color:var(--text-primary-color, #fff); }
     .rows { list-style:none; margin:0; padding:0 12px 8px; }
-    .row { align-items:center; border-bottom:1px solid var(--divider-color); display:grid; gap:10px; grid-template-columns:30px 38px minmax(0,1fr) auto 44px; min-height:92px; padding:10px 4px; }
+    .row { align-items:center; border-bottom:1px solid var(--divider-color); display:grid; gap:10px; grid-template-columns:30px 38px minmax(0,1fr) auto auto; min-height:92px; padding:10px 4px; }
     .row:last-child { border-bottom:0; }
     .rank { color:var(--secondary-text-color); font-size:.82rem; text-align:center; }
-    .brand { align-items:center; background:var(--secondary-background-color); border-radius:50%; display:flex; font-size:.7rem; font-weight:700; height:36px; justify-content:center; overflow:hidden; width:36px; }
+    .brand { align-items:center; background:var(--card-background-color, #fff); border:1px solid var(--divider-color); border-radius:8px; display:flex; height:40px; justify-content:center; overflow:hidden; width:40px; }
+    .brand svg { display:block; height:25px; width:25px; }
+    .brand-fallback { color:var(--secondary-text-color); height:25px; width:25px; }
     .details { min-width:0; }
     .name { font-size:.91rem; font-weight:600; line-height:1.25; overflow-wrap:anywhere; }
     .place,.updated { color:var(--secondary-text-color); font-size:.76rem; margin-top:4px; }
-    .prices { display:grid; gap:5px; min-width:88px; }
-    .price { font-variant-numeric:tabular-nums; font-size:.83rem; text-align:right; white-space:nowrap; }
-    .price small { color:var(--secondary-text-color); display:block; font-size:.66rem; }
+    .prices { align-content:center; display:grid; gap:7px; min-width:88px; }
+    .price { font-variant-numeric:tabular-nums; font-size:.9rem; font-weight:650; text-align:right; white-space:nowrap; }
+    .price small { color:var(--secondary-text-color); display:block; font-size:.68rem; font-weight:400; }
     .low { color:var(--success-color, #238636); } .mid { color:var(--warning-color, #9a6700); } .high { color:var(--error-color, #cf222e); }
-    .cheapest { background:var(--success-color, #238636); border-radius:3px; color:#fff; display:inline-block; font-size:.64rem; margin:4px 0 0; padding:2px 5px; }
+    .cheapest { background:var(--success-color, #238636); border-radius:4px; color:#fff; display:inline-block; font-size:.64rem; margin:4px 0 0; padding:3px 6px; }
     .distance { color:var(--secondary-text-color); font-size:.72rem; margin-top:4px; }
-    .nav { font-size:1.12rem; }
+    .nav { font-size:.78rem; font-weight:600; gap:6px; white-space:nowrap; }
+    .nav-icon { font-size:1.05rem; line-height:1; }
     .notice { color:var(--secondary-text-color); font-size:.85rem; padding:22px 18px; text-align:center; }
     .notice.error { color:var(--error-color, #cf222e); }
     .warning { color:var(--warning-color, #9a6700); font-size:.76rem; padding:8px 16px; }
     .skeleton { animation:pulse 1.2s ease-in-out infinite alternate; background:var(--secondary-background-color); border-radius:4px; height:12px; margin:10px 0; }
     @keyframes pulse { to { opacity:.45; } }
-    @media (max-width:420px) { .row { gap:6px; grid-template-columns:24px 32px minmax(0,1fr) auto 40px; } .brand { height:30px; width:30px; } .prices { min-width:76px; } .price { font-size:.76rem; } }
+    @media (max-width:480px) {
+      .row { align-items:start; gap:7px; grid-template-columns:22px 36px minmax(0,1fr) 70px; padding:14px 4px; }
+      .rank { grid-column:1; grid-row:1 / span 2; padding-top:7px; }
+      .brand { grid-column:2; grid-row:1; height:34px; width:34px; }
+      .brand svg,.brand-fallback { height:22px; width:22px; }
+      .details { grid-column:3; grid-row:1; }
+      .prices { align-items:flex-start; display:flex; flex-wrap:wrap; gap:8px 14px; grid-column:3; grid-row:2; justify-content:flex-start; min-width:0; padding-top:7px; }
+      .price { font-size:.8rem; text-align:left; }
+      .nav { align-self:center; grid-column:4; grid-row:1 / span 2; }
+    }
   `;
 
   setConfig(config: Partial<CardConfig>) {
     if (!config.api_url) throw new Error("Ninjas Gas Stations card requires api_url");
-    this._config = { ...DEFAULT_CONFIG, ...config, type: "custom:ninjas-gas-stations-card", api_url: config.api_url.replace(/\/$/, "") } as CardConfig;
-    this._sort = this._config.sort_by;
+    const fuels = config.fuels?.length ? config.fuels : [...DEFAULT_CONFIG.fuels];
+    const requestedSort = config.sort_by ?? DEFAULT_CONFIG.sort_by;
+    const sortBy = requestedSort === "distance" || fuels.includes(requestedSort)
+      ? requestedSort
+      : fuels[0];
+    this._config = {
+      ...DEFAULT_CONFIG,
+      ...config,
+      fuels,
+      sort_by: sortBy,
+      type: "custom:ninjas-gas-stations-card",
+      api_url: config.api_url.replace(/\/$/, ""),
+    } as CardConfig;
+    this._sort = sortBy;
   }
 
   connectedCallback() {
@@ -151,7 +174,7 @@ export class NinjasGasStationsCard extends LitElement {
       const parameters = new URLSearchParams({
         lat: String(location.lat), lon: String(location.lon),
         radius_km: String(this._config.radius_km), limit: String(this._config.limit),
-        fuels: this._config.fuels.join(","), sort: this._sort,
+        fuels: FUEL_KEYS.join(","), sort: this._sort,
       });
       const response = await fetch(`${this._config.api_url}/api/stations?${parameters}`, {
         headers: this._config.api_token ? { Authorization: `Bearer ${this._config.api_token}` } : {},
@@ -177,8 +200,9 @@ export class NinjasGasStationsCard extends LitElement {
     const labels: Record<SortMode, [string, string]> = {
       diesel: ["Gasóleo", "Diesel"],
       gasoline95: ["Gasolina 95", "Gasoline 95"],
-      dieselprime: ["Gasóleo esp.", "Premium diesel"],
-      gasolineprime: ["Gasolina prém.", "Premium gas"],
+      dieselprime: ["Gasóleo Prime", "Diesel Prime"],
+      gasolineprime: ["Gasolina Prime", "Gasoline Prime"],
+      gplauto: ["GPL Auto", "GPL Auto"],
       distance: ["Distância", "Nearest"],
     };
     return labels[mode][portuguese ? 0 : 1];
@@ -212,16 +236,25 @@ export class NinjasGasStationsCard extends LitElement {
     </div>`;
   }
 
+  private renderBrand(station: Station) {
+    const mark = brandMark(station.brand);
+    return html`<span class="brand" role="img" aria-label=${station.brand || station.name} title=${station.brand || station.name}>
+      ${mark
+        ? html`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill=${`#${mark.hex}`} d=${mark.path}></path></svg>`
+        : html`<svg class="brand-fallback" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 22V3h10v19H5Zm2-2h6V5H7v15Zm9-12h1.5l2.5 2.5V17a2 2 0 0 1-4 0v-2h2v2a.5.5 0 0 0 1 0v-5.7L16 10V8ZM8 7h4v4H8V7Z"></path></svg>`}
+    </span>`;
+  }
+
   private renderStation(station: Station, index: number) {
-    const fuels = this._config?.fuels ?? ["diesel", "gasoline95"];
+    const fuels = displayedFuels(this._config?.fuels ?? [...DEFAULT_CONFIG.fuels], this._sort);
     return html`<li class="row">
       <span class="rank" aria-label=${`Rank ${index + 1}`}>${index + 1}</span>
-      ${this._config?.show_brand_logo ? html`<span class="brand" aria-hidden="true">${(station.brand || station.name).slice(0, 2).toUpperCase()}</span>` : nothing}
+      ${this._config?.show_brand_logo ? this.renderBrand(station) : nothing}
       <div class="details"><div class="name">${station.name}</div>
         <div class="place">${[station.brand, station.municipality].filter(Boolean).join(" · ")}</div>
         <div class="distance">${station.distance_km.toFixed(1)} km</div></div>
       <div class="prices">${fuels.map((fuel) => this.renderPrice(station, fuel, this._stations))}</div>
-      <button class="nav" aria-label=${`Navigate to ${station.name} using ${this._config?.navigation_app}`} title="Navigate" @click=${() => this.openNavigation(station)}>↗</button>
+      <button class="nav" aria-label=${`Navigate to ${station.name} using ${this._config?.navigation_app}`} title=${`Navigate with ${this._config?.navigation_app}`} @click=${() => this.openNavigation(station)}><span class="nav-icon" aria-hidden="true">↗</span><span>${this._hass?.language?.startsWith("pt") ? "Navegar" : "Navigate"}</span></button>
     </li>`;
   }
 
@@ -238,7 +271,7 @@ export class NinjasGasStationsCard extends LitElement {
         <button class="refresh" aria-label=${pt ? "Atualizar postos" : "Refresh stations"} title=${pt ? "Atualizar" : "Refresh"} ?disabled=${this._busy} @click=${() => void this.refresh()}>↻</button>
       </header>
       <nav class="modes" aria-label=${pt ? "Ordenar por" : "Sort by"}>
-        ${(["diesel", "gasoline95", "dieselprime", "gasolineprime", "distance"] as const).map((mode) => html`<button aria-pressed=${this._sort === mode} @click=${() => this.setSort(mode)}>${this.sortLabel(mode, pt)}</button>`)}
+        ${SORT_MODES.map((mode) => html`<button aria-pressed=${this._sort === mode} @click=${() => this.setSort(mode)}>${this.sortLabel(mode, pt)}</button>`)}
       </nav>
       ${this._stale ? html`<div class="warning" role="status">${pt ? "Preços em cache: atualização temporariamente indisponível." : "Cached prices: live refresh is temporarily unavailable."}</div>` : nothing}
       ${this._busy && !this._stations.length ? html`<div class="notice" aria-label="Loading">${[1, 2, 3].map(() => html`<div class="skeleton"></div>`)}</div>` : nothing}

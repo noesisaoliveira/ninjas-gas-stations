@@ -45,7 +45,18 @@ logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
 for log_handler in logging.getLogger().handlers:
     log_handler.setFormatter(JsonLogFormatter())
 logger = logging.getLogger("ninjas_gas_stations")
-PRIME_FUEL_LABELS = set(FUEL_LABEL_GROUPS["dieselprime"]) | set(FUEL_LABEL_GROUPS["gasolineprime"])
+CACHE_UPGRADE_FUEL_KEYS = ("dieselprime", "gasolineprime", "gplauto")
+
+
+def _cache_needs_fuel_refresh(stations: list[Station]) -> bool:
+    return any(
+        not any(
+            price.label in FUEL_LABEL_GROUPS[fuel_key]
+            for station in stations
+            for price in station.prices.values()
+        )
+        for fuel_key in CACHE_UPGRADE_FUEL_KEYS
+    )
 
 
 def _load_options() -> dict[str, Any]:
@@ -149,11 +160,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     cached = cache.get()
     stations = [_station_from_json(item) for item in cached] if cached else []
     last_refresh = datetime.fromtimestamp(cache._stored_at, UTC) if cached else None
-    if cached and not any(
-        price.label in PRIME_FUEL_LABELS
-        for station in stations
-        for price in station.prices.values()
-    ):
+    if cached and _cache_needs_fuel_refresh(stations):
         cache.expire()
         logger.info("Legacy station cache found; scheduling refresh for the additional fuel types")
     app.state.provider = provider
@@ -186,7 +193,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await provider.close()
 
 
-app = FastAPI(title="Ninjas Gas Stations", version="0.1.8", lifespan=lifespan)
+app = FastAPI(title="Ninjas Gas Stations", version="0.1.10", lifespan=lifespan)
 _request_times: dict[str, list[float]] = {}
 
 
@@ -296,7 +303,8 @@ async def get_stations(
     limit: int | None = Query(default=None, ge=1, le=50),
     fuels: str | None = None,
     sort: str = Query(
-        default="diesel", pattern="^(diesel|gasoline95|dieselprime|gasolineprime|distance)$"
+        default="diesel",
+        pattern="^(diesel|gasoline95|dieselprime|gasolineprime|gplauto|distance)$",
     ),
 ) -> JSONResponse:
     await _refresh(request)

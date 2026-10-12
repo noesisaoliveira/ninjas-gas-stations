@@ -19,6 +19,7 @@ FUEL_LABELS = {
     "gasoline95": "Gasolina simples 95",
     "dieselprime": "Gasóleo especial",
     "gasolineprime": "Gasolina premium",
+    "gplauto": "GPL Auto",
 }
 FUEL_LABEL_GROUPS = {
     "diesel": ("Gasóleo simples",),
@@ -29,6 +30,7 @@ FUEL_LABEL_GROUPS = {
         "Gasolina especial 95",
         "Gasolina especial 98",
     ),
+    "gplauto": ("GPL Auto",),
 }
 PAGE_SIZE = 50
 MAX_PAGES = 80

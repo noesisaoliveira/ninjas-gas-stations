@@ -4,7 +4,7 @@ from pathlib import Path
 
 from app.dgeg import DgegProvider
 from app.geo import haversine_km, within_radius_bbox
-from app.main import _serialize_station, _station_sort_key
+from app.main import _cache_needs_fuel_refresh, _serialize_station, _station_sort_key
 from app.models import FuelPrice, Station
 
 
@@ -73,6 +73,45 @@ def test_gasolineprime_uses_cheapest_special_grade_per_station() -> None:
         "updated_at": None,
     }
     assert _station_sort_key(station, "gasolineprime", 2.0) == (1.79, 2.0)
+
+
+def test_gpl_auto_serializes_and_sorts_as_its_own_fuel() -> None:
+    station = Station(
+        id="gpl",
+        name="GPL Station",
+        brand=None,
+        address=None,
+        municipality=None,
+        latitude=38,
+        longitude=-9,
+        prices={"1120": FuelPrice("1120", "GPL Auto", 0.929, None)},
+    )
+
+    serialized = _serialize_station(station, 1.0)
+
+    assert serialized["prices"]["gplauto"]["label"] == "GPL Auto"
+    assert serialized["prices"]["gplauto"]["price_eur"] == 0.929
+    assert _station_sort_key(station, "gplauto", 1.0) == (0.929, 1.0)
+
+
+def test_cache_refresh_checks_each_added_fuel_group() -> None:
+    station = Station(
+        id="1",
+        name="Station",
+        brand=None,
+        address=None,
+        municipality=None,
+        latitude=38,
+        longitude=-9,
+        prices={
+            "2105": FuelPrice("2105", "Gasóleo especial", 1.8, None),
+            "3400": FuelPrice("3400", "Gasolina 98", 1.9, None),
+        },
+    )
+
+    assert _cache_needs_fuel_refresh([station])
+    station.prices["1120"] = FuelPrice("1120", "GPL Auto", 0.9, None)
+    assert not _cache_needs_fuel_refresh([station])
 
 
 def test_recorded_dgeg_fixture_matches_live_response_shape() -> None:

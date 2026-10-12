@@ -1,5 +1,8 @@
 import type { FuelKey, HassEntity, SortMode, Station } from "./types";
 
+export const FUEL_KEYS = ["diesel", "gasoline95", "dieselprime", "gasolineprime", "gplauto"] as const;
+export const SORT_MODES = [...FUEL_KEYS, "distance"] as const;
+
 export function entityLocation(entity: HassEntity | undefined): { lat: number; lon: number } | undefined {
   if (!entity) return undefined;
   const lat = Number(entity.attributes.latitude);
@@ -19,6 +22,10 @@ export function sortStations(stations: Station[], mode: SortMode): Station[] {
   });
 }
 
+export function displayedFuels(configured: FuelKey[], mode: SortMode): FuelKey[] {
+  return mode === "distance" ? [...configured] : [mode];
+}
+
 export function priceLevel(price: number, prices: number[]): "low" | "mid" | "high" {
   const sorted = [...prices].sort((left, right) => left - right);
   const rank = sorted.indexOf(price);
@@ -32,7 +39,8 @@ export function fuelName(key: FuelKey, language?: string): string {
   if (key === "diesel") return portuguese ? "Gasóleo simples" : "Diesel";
   if (key === "gasoline95") return portuguese ? "Gasolina simples 95" : "Gasoline 95";
   if (key === "dieselprime") return portuguese ? "Gasóleo especial" : "Premium diesel";
-  return portuguese ? "Gasolina premium" : "Premium gasoline";
+  if (key === "gasolineprime") return portuguese ? "Gasolina premium" : "Premium gasoline";
+  return "GPL Auto";
 }
 
 export function relativeUpdatedAt(value: string | null, language?: string): string {

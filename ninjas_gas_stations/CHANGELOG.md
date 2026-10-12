@@ -2,6 +2,16 @@
 
 Notable changes to Ninjas Gas Stations are documented here. Versions are listed newest first.
 
+## 0.1.10 - 2026-10-12
+
+- Added GPL Auto as a standalone fuel tab and price returned by the API.
+- Added GPL Auto to card configuration, nearest-mode options, provider cache refresh, and sorting.
+
+## 0.1.9 - 2026-10-12
+
+- In fuel-sorted card modes, show only the selected fuel price; Nearest shows every configured fuel price.
+- Replaced station initials with bundled logos for recognized brands and a generic fuel-pump mark when no brand logo is available.
+
 ## 0.1.8 - 2026-10-12
 
 - Added `dieselprime` for Gasóleo especial.
