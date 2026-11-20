@@ -2,6 +2,10 @@
 
 Notable changes to Ninjas Gas Stations are documented here. Versions are listed newest first.
 
+## 0.1.17 - 2026-11-20
+
+- Refresh the Home Assistant add-on icon and logo.
+
 ## 0.1.16 - 2026-10-12
 
 - Preserve last-known prices for fuels whose DGEG refresh fails, while preferring newly fetched prices.
